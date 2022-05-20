@@ -1,0 +1,8 @@
+[tool.yapf]
+based_on_style = "google"
+
+[tool.yapfignore]
+ignore_patterns = [
+  ".git",
+  "venv"
+]

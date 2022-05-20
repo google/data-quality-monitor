@@ -1,0 +1,4 @@
+[flake8]
+exclude = .git,venv
+max-line-length = 80
+max-complexity = 12

@@ -1,0 +1,43 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_language_version:
+  python: python3.9
+exclude: ".git,venv,build,dist"
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      # Perform general housekeeping
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: trailing-whitespace
+      - id: fix-byte-order-marker
+      - id: end-of-file-fixer
+      - id: requirements-txt-fixer
+      # Check misc filetypes
+      - id: check-yaml
+      - id: check-json
+      - id: pretty-format-json
+  # Lint code for PEP8
+  - repo: https://github.com/pycqa/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+  # Lint code for types
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.950
+    hooks:
+      - id: mypy
+  # Check code formatting
+  - repo: https://github.com/google/yapf
+    rev: v0.32.0
+    hooks:
+      - id: yapf
+        args: ["--parallel", "--recursive", "--diff", "."]
+        additional_dependencies: ["toml"]
+  # Check code import ordering
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        args: ["--diff", "."]
