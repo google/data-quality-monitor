@@ -20,7 +20,7 @@ the underlying commands for reference.
 
 ```bash
 # Setup dev environment
-make setup
+make install
 ###############################
 python3 -m venv ./venv
 source ./venv/bin/activate
