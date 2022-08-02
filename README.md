@@ -11,6 +11,15 @@ It can act on any data sitting in Bigquery, including exports from various Googl
 file and scheduled as required. The output are logs that can be visualised and
 monitored for subsequent action. We also provide templates for common usecases.
 
+## Security
+
+### Service Account
+
+IAM Permissions:
+
+* BigQuery Data Viewer
+* BigQuery Read Session User
+
 ## Development
 
 ### Requirements
