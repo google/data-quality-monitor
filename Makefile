@@ -5,6 +5,9 @@ VENV_DIRNAME = venv
 export VIRTUAL_ENV := $(abspath ${VENV_DIRNAME})
 export PATH := ${VIRTUAL_ENV}/bin:${PATH}
 
+include .env
+export
+
 define PROJECT_HELP_MSG
 Usage: make [target]
 Targets:
@@ -59,7 +62,7 @@ format:
 	python3 -m isort --atomic .
 
 test:
-	python3 -m unittest
+	python3 -m unittest $(ARGS)
 
 verify:
 	pre-commit run --all-files

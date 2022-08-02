@@ -5,8 +5,7 @@ __pycache__/
 
 # Environments
 .env
-.venv
-env/
+!example.env
 venv/
 
 # Visual Studio Code

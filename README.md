@@ -13,9 +13,30 @@ monitored for subsequent action. We also provide templates for common usecases.
 
 ## Development
 
+### Requirements
+
 This solution requires [Python 3.9+](https://www.python.org/downloads/). We use
 [make](https://www.gnu.org/software/make/) to easily automate tooling for setup,
-linting, formatting, and testing. A standard workflow is depicted below, alongside
+linting, formatting, and testing.
+
+#### Developer Account
+
+IAM Permissions:
+
+* Service Account Token Creator
+
+#### ENV file
+
+Make a copy of `example.env` as `.env` and fill in the values:
+
+```bash
+GCP_PROJECT_ID=data-quality-monitor-example
+SERVICE_ACCOUNT_EMAIL=dqm@project-id.iam.gserviceaccount.com
+```
+
+### Workflow
+
+The standard make workflow is depicted below, alongside
 the underlying commands for reference.
 
 ```bash
@@ -26,6 +47,13 @@ python3 -m venv ./venv
 source ./venv/bin/activate
 pip install -r requirements.txt
 pre-commit install
+###############################
+
+# Setup cloud environment
+###############################
+export $(xargs <.env)
+gcloud auth login
+gcloud config set project $GCP_PROJECT_ID
 ###############################
 
 # Lint & type-check code
@@ -45,6 +73,7 @@ python3 -m isort --atomic .
 # Run tests
 make test
 ###############################
+export $(xargs <.env)
 python3 -m unittest
 ###############################
 
