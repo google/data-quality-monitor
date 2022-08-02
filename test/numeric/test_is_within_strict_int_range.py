@@ -15,6 +15,7 @@ limitations under the License.
 """
 
 import unittest
+from typing import cast
 
 from rules.numeric import is_within_strict_int_range
 
@@ -49,11 +50,11 @@ class IntIsWithinStrictIntRangeTest(unittest.TestCase):
 
     def test_negative_at_bounds(self):
         # -10 is the lower bound
-        self.assertIn('not within', self.rule_checker(-10))
+        self.assertIn('not within', cast(str, self.rule_checker(-10)))
 
     def test_negative_past_bounds(self):
         # -11 is past the lower bound
-        self.assertIn('not within', self.rule_checker(-11))
+        self.assertIn('not within', cast(str, self.rule_checker(-11)))
 
     def test_positive_near_bounds(self):
         # +9 is near the upper bound
@@ -61,11 +62,11 @@ class IntIsWithinStrictIntRangeTest(unittest.TestCase):
 
     def test_positive_at_bounds(self):
         # +10 is the upper bound
-        self.assertIn('not within', self.rule_checker(10))
+        self.assertIn('not within', cast(str, self.rule_checker(10)))
 
     def test_positive_past_bounds(self):
         # +11 is past the upper bound
-        self.assertIn('not within', self.rule_checker(11))
+        self.assertIn('not within', cast(str, self.rule_checker(11)))
 
 
 class FloatIsWithinStrictIntRangeTest(unittest.TestCase):
@@ -98,11 +99,11 @@ class FloatIsWithinStrictIntRangeTest(unittest.TestCase):
 
     def test_negative_at_bounds(self):
         # -10.0 is the lower bound
-        self.assertIn('not within', self.rule_checker(-10.0))
+        self.assertIn('not within', cast(str, self.rule_checker(-10.0)))
 
     def test_negative_past_bounds(self):
         # -10.1 is past the lower bound
-        self.assertIn('not within', self.rule_checker(-10.1))
+        self.assertIn('not within', cast(str, self.rule_checker(-10.1)))
 
     def test_positive_near_bounds(self):
         # +9.9 is near the upper bound
@@ -110,8 +111,8 @@ class FloatIsWithinStrictIntRangeTest(unittest.TestCase):
 
     def test_positive_at_bounds(self):
         # +10.0 is the upper bound
-        self.assertIn('not within', self.rule_checker(10.0))
+        self.assertIn('not within', cast(str, self.rule_checker(10.0)))
 
     def test_positive_past_bounds(self):
         # +10.1 is past the upper bound
-        self.assertIn('not within', self.rule_checker(10.1))
+        self.assertIn('not within', cast(str, self.rule_checker(10.1)))

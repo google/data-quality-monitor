@@ -16,6 +16,7 @@ limitations under the License.
 
 import math
 import unittest
+from typing import cast
 
 from rules.numeric import (Infinity, NegativeInfinity, NotANumber,
                            PositiveInfinity, parse_float)
@@ -68,16 +69,18 @@ class ParseFloatTest(unittest.TestCase):
 
     def test_not_a_number_value(self):
         # NaN is a float
-        self.assertTrue(math.isnan(self.value_parser(NotANumber)))
+        self.assertTrue(math.isnan(cast(float, self.value_parser(NotANumber))))
 
     def test_string(self):
         # abc is not a number
-        self.assertIn('not a valid float', self.value_parser("abc"))
+        self.assertIn('not a valid float', cast(str, self.value_parser("abc")))
 
     def test_alphanumeric_string(self):
         # 9xyz1 is not a number
-        self.assertIn('not a valid float', self.value_parser("9xyz1"))
+        self.assertIn('not a valid float', cast(str,
+                                                self.value_parser("9xyz1")))
 
     def test_alphanumeric_string_with_leading_zeros(self):
         # 0xyz123 is not a number
-        self.assertIn('not a valid float', self.value_parser("00xyz123"))
+        self.assertIn('not a valid float',
+                      cast(str, self.value_parser("00xyz123")))

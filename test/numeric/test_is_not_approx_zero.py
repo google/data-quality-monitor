@@ -15,13 +15,14 @@ limitations under the License.
 """
 
 import unittest
+from typing import cast
 
 from rules.numeric import IEEE_TOLERANCE, is_not_approx_zero
 
 
 class IsNotApproxZeroTest(unittest.TestCase):
 
-    def setUp(self) -> None:
+    def setUp(self):
         # Use default ieee tolerance
         self.rule_checker = is_not_approx_zero()
         return super().setUp()
@@ -31,11 +32,12 @@ class IsNotApproxZeroTest(unittest.TestCase):
 
     def test_integer_zero(self):
         # 0 is zero
-        self.assertIn('is approximately zero', self.rule_checker(0))
+        self.assertIn('is approximately zero', cast(str, self.rule_checker(0)))
 
     def test_float_zero(self):
         # 0.0 is zero
-        self.assertIn('is approximately zero', self.rule_checker(0.0))
+        self.assertIn('is approximately zero', cast(str,
+                                                    self.rule_checker(0.0)))
 
     def test_positive_small_float(self):
         # +0.00002 is not zero
@@ -56,7 +58,7 @@ class IsNotApproxZeroTest(unittest.TestCase):
 
 class IsNotApproxZeroDefaultToleranceThresholdsTest(unittest.TestCase):
 
-    def setUp(self) -> None:
+    def setUp(self):
         # Use default ieee tolerance
         self.tolerance = IEEE_TOLERANCE
         self.rule_checker = is_not_approx_zero()
@@ -65,22 +67,22 @@ class IsNotApproxZeroDefaultToleranceThresholdsTest(unittest.TestCase):
     def test_near_positive_tolerance(self):
         # Near but below positive tolerance is zero
         self.assertIn('is approximately zero',
-                      self.rule_checker(+self.tolerance * 0.99))
+                      cast(str, self.rule_checker(+self.tolerance * 0.99)))
 
     def test_near_negative_tolerance(self):
         # Near but below negative tolerance is zero
         self.assertIn('is approximately zero',
-                      self.rule_checker(-self.tolerance * 0.99))
+                      cast(str, self.rule_checker(-self.tolerance * 0.99)))
 
     def test_full_positive_tolerance(self):
         # Full positive tolerance is zero
         self.assertIn('is approximately zero',
-                      self.rule_checker(+self.tolerance))
+                      cast(str, self.rule_checker(+self.tolerance)))
 
     def test_full_negative_tolerance(self):
         # Full negative tolerance is zero
         self.assertIn('is approximately zero',
-                      self.rule_checker(-self.tolerance))
+                      cast(str, self.rule_checker(-self.tolerance)))
 
     def test_beyond_positive_tolerance(self):
         # Beyond positive tolerance is not zero
@@ -93,7 +95,7 @@ class IsNotApproxZeroDefaultToleranceThresholdsTest(unittest.TestCase):
 
 class IsNotApproxZeroCustomToleranceThresholdsTest(unittest.TestCase):
 
-    def setUp(self) -> None:
+    def setUp(self):
         # Use custom tolerance of 0.001
         self.tolerance = 0.001
         self.rule_checker = is_not_approx_zero(self.tolerance)
@@ -101,22 +103,22 @@ class IsNotApproxZeroCustomToleranceThresholdsTest(unittest.TestCase):
     def test_near_positive_tolerance(self):
         # Near but below positive tolerance is zero
         self.assertIn('is approximately zero',
-                      self.rule_checker(+self.tolerance * 0.99))
+                      cast(str, self.rule_checker(+self.tolerance * 0.99)))
 
     def test_near_negative_tolerance(self):
         # Near but below negative tolerance is zero
         self.assertIn('is approximately zero',
-                      self.rule_checker(-self.tolerance * 0.99))
+                      cast(str, self.rule_checker(-self.tolerance * 0.99)))
 
     def test_full_positive_tolerance(self):
         # Full positive tolerance is zero
         self.assertIn('is approximately zero',
-                      self.rule_checker(+self.tolerance))
+                      cast(str, self.rule_checker(+self.tolerance)))
 
     def test_full_negative_tolerance(self):
         # Full negative tolerance is zero
         self.assertIn('is approximately zero',
-                      self.rule_checker(-self.tolerance))
+                      cast(str, self.rule_checker(-self.tolerance)))
 
     def test_beyond_positive_tolerance(self):
         # Beyond positive tolerance is not zero

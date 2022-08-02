@@ -19,7 +19,7 @@ linting, formatting, and testing. A standard workflow is depicted below, alongsi
 the underlying commands for reference.
 
 ```bash
-# Setup dev environment
+# Install dev environment
 make install
 ###############################
 python3 -m venv ./venv
@@ -52,6 +52,32 @@ python3 -m unittest
 make verify
 ###############################
 pre-commit run --all-files
+###############################
+
+# Cleanup environment
+make clean
+###############################
+find . \
+  -type f -name "*.py[co]" \
+  -o -type d -name __pycache__ \
+  -o -type d -name .mypy_cache \
+  -exec rm -rf {} +
+###############################
+
+# Uninstall dev environment
+make uninstall
+###############################
+pre-commit uninstall \
+  -t pre-commit \
+  -t pre-merge-commit \
+  -t pre-push \
+  -t prepare-commit-msg \
+  -t commit-msg \
+  -t post-commit \
+  -t post-checkout \
+  -t post-merge \
+  -t post-rewrite
+ rm -rf ./venv/
 ###############################
 ```
 

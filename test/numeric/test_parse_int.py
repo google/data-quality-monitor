@@ -15,6 +15,7 @@ limitations under the License.
 """
 
 import unittest
+from typing import cast
 
 from rules.numeric import parse_int
 
@@ -50,16 +51,17 @@ class ParseIntTest(unittest.TestCase):
 
     def test_floating_point_value(self):
         # 1.5 is a float, not int
-        self.assertIn('not a valid int', self.value_parser("1.5"))
+        self.assertIn('not a valid int', cast(str, self.value_parser("1.5")))
 
     def test_string(self):
         # abc is not a number
-        self.assertIn('not a valid int', self.value_parser("abc"))
+        self.assertIn('not a valid int', cast(str, self.value_parser("abc")))
 
     def test_alphanumeric_string(self):
         # 9xyz1 is not a number
-        self.assertIn('not a valid int', self.value_parser("9xyz1"))
+        self.assertIn('not a valid int', cast(str, self.value_parser("9xyz1")))
 
     def test_alphanumeric_string_with_leading_zeros(self):
         # 0xyz123 is not a number
-        self.assertIn('not a valid int', self.value_parser("00xyz123"))
+        self.assertIn('not a valid int', cast(str,
+                                              self.value_parser("00xyz123")))

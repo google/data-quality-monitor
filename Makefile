@@ -44,15 +44,18 @@ uninstall:
 	rm -rf "$(VIRTUAL_ENV)"
 
 clean:
-	find . -name "*.py[co]" -o -name __pycache__ -exec rm -rf {} +
-	rm -rf .mypy_cache
+	find . \
+		-type f -name "*.py[co]" \
+		-o -type d -name __pycache__ \
+		-o -type d -name .mypy_cache \
+		-exec rm -rf {} +
 
 lint:
 	python3 -m flake8 .
 	python3 -m mypy .
 
 format:
-	python3 -m yapf --parallel --in-place --recursive .
+	python3 -m yapf --parallel --recursive --in-place .
 	python3 -m isort --atomic .
 
 test:

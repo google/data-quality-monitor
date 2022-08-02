@@ -15,6 +15,7 @@ limitations under the License.
 """
 
 import unittest
+from typing import cast
 
 from rules.numeric import is_not_negative
 
@@ -43,7 +44,7 @@ class IntIsNotNegativeTest(unittest.TestCase):
 
     def test_negative_is_negative(self):
         # -4 < 0
-        self.assertIn('is a negative', self.rule_checker(-4))
+        self.assertIn('is a negative', cast(str, self.rule_checker(-4)))
 
     def test_bigquery_max_positive_int(self):
         # +max_int is positive
@@ -51,7 +52,7 @@ class IntIsNotNegativeTest(unittest.TestCase):
 
     def test_bigquery_max_negative_int(self):
         # -max_int is negative
-        self.assertIn('is a negative', self.rule_checker(-MAX_INT))
+        self.assertIn('is a negative', cast(str, self.rule_checker(-MAX_INT)))
 
 
 class FloatIsNotNegativeTest(unittest.TestCase):
@@ -73,4 +74,4 @@ class FloatIsNotNegativeTest(unittest.TestCase):
 
     def test_negative_is_negative(self):
         # -4 < 0
-        self.assertIn('is a negative', self.rule_checker(-4.0))
+        self.assertIn('is a negative', cast(str, self.rule_checker(-4.0)))
