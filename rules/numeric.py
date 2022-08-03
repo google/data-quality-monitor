@@ -36,7 +36,7 @@ def parse_int() -> TypeParser[Numeric]:
     the given string value.
 
     Returns:
-        * int, if valid
+        * int value - if valid
         * Error message, otherwise
     """
 
@@ -55,7 +55,7 @@ def parse_float() -> TypeParser[Numeric]:
     the given string value.
 
     Returns:
-        * float, if valid
+        * float value - if valid
         * Error message, otherwise
     """
 
@@ -75,7 +75,7 @@ def is_within_strict_int_range(lower_bound: int,
     i.e. (lower_bound, upper_bound), with both bounds exclusive.
 
     Returns:
-        * None, if lower_bound < value < upper_bound
+        * None - if lower_bound < value < upper_bound
         * Error message, otherwise
     """
 
@@ -94,7 +94,7 @@ def is_not_negative() -> RuleChecker[Numeric]:
     i.e NOT positive (+) or zero (0).
 
     Returns:
-        * None, if value >= 0
+        * None - if value >= 0
         * Error message, otherwise
     """
 
@@ -117,11 +117,11 @@ def is_not_approx_zero(
     tolerance of zero (0) i.e [0 - tolerance, 0 + tolerance].
 
     Defaults:
-        * tolerance: 1e-8 (8 decimal digits), as per\
+        * tolerance - 1e-8 (8 decimal digits), as per\
             [PEP485](https://peps.python.org/pep-0485/#absolute-tolerance-default).
 
     Returns:
-        * None, if abs(value) > abs(tolerance)
+        * None - if abs(value) > abs(tolerance)
         * Error message, otherwise
     """
     absolute_tolerance = abs(tolerance)

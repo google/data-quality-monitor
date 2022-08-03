@@ -32,17 +32,21 @@ We wrap the actual parsing function, so that configured parameters can be
 evaluated to generate a "finalised" function with better runtime performance.
 
 Example -
-def parse_type(option_one: type_one,
-               option_def: type_def = default_value,
+def parse_type(arg_one: type_one,
+               arg_def: type_def = default_value,
                ...) -> TypeParser[Type]:
     '''
-    Parse Type from value - given option_one, option_def, etc.
+    Parse Type from value - given arg_one, arg_def, etc.
 
-    Defaults -
-        arg_def: default value
+    Arguments:
+        * arg_one - argument
 
-    Returns -
-        Parsed Type value
+    Defaults:
+        * arg_def - default value
+
+    Returns:
+        * Type value
+        * Error message, otherwise
     '''
     def _parser(value: str) -> TypeOutput[Type]:
         try:
@@ -71,18 +75,21 @@ Example -
                   arg_def: type_def = default_value,
                   ...) -> RuleChecker[Type]:
         '''
-        Checks if the value IS/NOT a foobar - given arg_one, arg_def, etc.
+        Checks if the value IS a foobar - given arg_one, arg_def, etc.
 
-        Defaults -
-            arg_def: default value
+        Arguments:
+            * arg_one - argument
 
-        Returns -
-            'error msg' if is foobar
-            None if not foobar
+        Default:
+            * arg_def - default value
+
+        Returns:
+            * None - if value is foobar
+            * Error message, otherwise
         '''
         def _checker(value: Type) -> RuleOutput:
             if meets_conditions(value, arg_one, ...):
-                return 'error msg'
+                return 'Value is not foobar.'
             else:
                 return None
 
