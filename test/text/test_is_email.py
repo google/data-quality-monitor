@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import sys
 import unittest
 
 from rules.text import is_email
 
 
 class IsEmail(unittest.TestCase):
+
     def setUp(self) -> None:
         self.rule_checker = is_email()
         return super().setUp()
@@ -50,8 +50,8 @@ class IsEmail(unittest.TestCase):
         self.assertIsNotNone(self.rule_checker("john@doe.com "))
 
         # email in random string
-        self.assertIsNotNone(self.rule_checker("asdfasdfsdf john@doe.comdsfkjaslkje8kd"))
-
+        self.assertIsNotNone(
+            self.rule_checker("asdfasdfsdf john@doe.comdsfkjaslkje8kd"))
 
     def test_invalid_characters(self):
         # quotes
@@ -66,8 +66,7 @@ class IsEmail(unittest.TestCase):
 
         # backslash
         # self.assertIsNone(self.rule_checker("jo\hn@doe.com"))
-        self.assertIsNone(self.rule_checker("john@do\e.com"))
-
+        self.assertIsNone(self.rule_checker(r"john@do\e.com"))
 
     def test_invalid_email_structure(self):
         # missing address sign
@@ -90,7 +89,6 @@ class IsEmail(unittest.TestCase):
 
         # double dot in domain
         self.assertIsNone(self.rule_checker("john@doe..com"))
-
 
     def test_invalid_input(self):
         # number string

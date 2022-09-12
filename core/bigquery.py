@@ -27,7 +27,7 @@ from google.oauth2.credentials import Credentials as OAuthCredentials
 SCOPES = ('https://www.googleapis.com/auth/bigquery',
           'https://www.googleapis.com/auth/cloud-platform')
 
-Credentials = Union[OAuthCredentials, ImpersonatedCredentials, None]
+Credentials = Union[OAuthCredentials, ImpersonatedCredentials]
 
 
 class DataFormats(Enum):

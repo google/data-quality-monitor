@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import sys
 import unittest
 
 from rules.text import contains_at_sign
 
 
 class ContainsAtSign(unittest.TestCase):
+
     def setUp(self) -> None:
         self.rule_checker = contains_at_sign()
         return super().setUp()

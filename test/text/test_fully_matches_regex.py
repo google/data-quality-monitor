@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import re
-import sys
 import unittest
 
 from rules.text import fully_matches_regex
 
 
 class fullyMatchesRegex(unittest.TestCase):
+
     def setUp(self) -> None:
         test_regex = r'test'
         self.rule_checker = fully_matches_regex(test_regex)
@@ -38,11 +38,10 @@ class fullyMatchesRegex(unittest.TestCase):
         self.assertIsNone(self.rule_checker('123'))
 
     def test_invalid_regex_behaviour(self):
-      # pass invalid regex
-      test_regex = '['
+        # pass invalid regex
+        test_regex = '['
 
-
-      # assert that error is raised
-      with self.assertRaises(re.error):
-        rule_checker = fully_matches_regex(test_regex)
-        rule_checker('123')
+        # assert that error is raised
+        with self.assertRaises(re.error):
+            rule_checker = fully_matches_regex(test_regex)
+            rule_checker('123')
