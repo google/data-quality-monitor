@@ -1,4 +1,5 @@
 flake8==4.0.1
+Flask-Pydantic==0.10.0
 functions-framework==3.2.0
 functions-wrapper==1.0.2
 google-auth==2.9.1
@@ -7,5 +8,6 @@ google-cloud-bigquery-storage==2.14.1
 isort==5.10.1
 mypy==0.950
 pre-commit==2.19.0
+pydantic==1.10.2
 toml==0.10.2
 yapf==0.32.0
