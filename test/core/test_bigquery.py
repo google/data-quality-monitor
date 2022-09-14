@@ -21,10 +21,11 @@ from collections.abc import Iterable
 from google.cloud.bigquery import Client as BigQueryLegacyClient
 from google.cloud.bigquery_storage import BigQueryReadClient
 
-from core.bigquery import (ImpersonatedCredentials, OAuthCredentials,
-                           get_bq_legacy_client, get_bq_storage_read_client,
-                           get_default_credentials, get_readrows_iterator,
-                           get_service_account_credentials)
+from core.auth import (ImpersonatedCredentials, OAuthCredentials,
+                       get_default_credentials,
+                       get_service_account_credentials)
+from core.bigquery import (TableMetadata, get_bq_legacy_client,
+                           get_bq_storage_read_client, get_readrows_iterator)
 
 
 class BigQueryClientCredentialsTest(unittest.TestCase):
@@ -83,8 +84,8 @@ class BigQueryReadRowsTest(unittest.TestCase):
         return super().setUp()
 
     def test_get_readrows_iterator(self):
-        rows = get_readrows_iterator(self.bqs_client,
-                                     os.environ['GCP_PROJECT_ID'],
-                                     os.environ['TEST_DATASET_ID'],
-                                     os.environ['TEST_TABLE_NAME'])
+        table_metadata = TableMetadata(project_id=os.environ['GCP_PROJECT_ID'],
+                                       dataset_id=os.environ['TEST_DATASET_ID'],
+                                       table_name=os.environ['TEST_TABLE_NAME'])
+        rows = get_readrows_iterator(self.bqs_client, table_metadata)
         self.assertTrue(isinstance(rows, Iterable))
