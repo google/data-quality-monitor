@@ -15,8 +15,20 @@ limitations under the License.
 """
 
 import re
+from typing import Any
 
-from .common import RuleChecker, RuleOutput
+from .common import RuleChecker, RuleOutput, RuleWrapper
+
+
+def parse_str(value: Any) -> str:
+    """
+    Convert the provided value into a string value.
+
+    Returns:
+        * string value
+    """
+
+    return str(value)
 
 
 def is_email() -> RuleChecker[str]:
@@ -102,3 +114,12 @@ def is_phone_number() -> RuleChecker[str]:
             return None
 
     return _checker
+
+
+TextRules: dict[str, RuleWrapper[str]] = {
+    'is_email': is_email,
+    'contains_at_sign': contains_at_sign,
+    'search_regex': search_regex,
+    'fully_matches_regex': fully_matches_regex,
+    'is_phone_number': is_phone_number,
+}

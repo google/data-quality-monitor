@@ -15,9 +15,9 @@ limitations under the License.
 """
 
 import math
-from typing import Union
+from typing import Any, Union
 
-from .common import RuleChecker, RuleOutput, TypeOutput, TypeParser
+from .common import RuleChecker, RuleOutput, RuleWrapper
 
 # Define numeric value as either int or float
 Numeric = Union[int, float]
@@ -30,42 +30,32 @@ PositiveInfinity = '+inf'
 NegativeInfinity = '-inf'
 
 
-def parse_int() -> TypeParser[Numeric]:
+def parse_int(value: Any) -> Numeric:
     """
-    Attempts to parse a valid integer value from
-    the given string value.
+    Attempts to parse a valid integer value from Any value.
 
     Returns:
-        * int value - if valid
-        * Error message, otherwise
+        * int value: if valid
+
+    Raises:
+        * ValueError: if parsing failed
     """
 
-    def _parser(value: str) -> TypeOutput[Numeric]:
-        try:
-            return int(value)
-        except ValueError:
-            return 'Value is not a valid integer.'
-
-    return _parser
+    return int(value)
 
 
-def parse_float() -> TypeParser[Numeric]:
+def parse_float(value: Any) -> Numeric:
     """
-    Attempts to parse a valid floating point value from
-    the given string value.
+    Attempts to parse a valid floating point value from Any value.
 
     Returns:
-        * float value - if valid
-        * Error message, otherwise
+        * float value: if valid
+
+    Raises:
+        * ValueError: if parsing failed
     """
 
-    def _parser(value: str) -> TypeOutput[Numeric]:
-        try:
-            return float(value)
-        except ValueError:
-            return 'Value is not a valid floating point.'
-
-    return _parser
+    return float(value)
 
 
 def is_within_strict_int_range(lower_bound: int,
@@ -75,7 +65,7 @@ def is_within_strict_int_range(lower_bound: int,
     i.e. (lower_bound, upper_bound), with both bounds exclusive.
 
     Returns:
-        * None - if lower_bound < value < upper_bound
+        * None: if lower_bound < value < upper_bound
         * Error message, otherwise
     """
 
@@ -94,7 +84,7 @@ def is_not_negative() -> RuleChecker[Numeric]:
     i.e NOT positive (+) or zero (0).
 
     Returns:
-        * None - if value >= 0
+        * None: if value >= 0
         * Error message, otherwise
     """
 
@@ -117,11 +107,11 @@ def is_not_approx_zero(
     tolerance of zero (0) i.e [0 - tolerance, 0 + tolerance].
 
     Defaults:
-        * tolerance - 1e-8 (8 decimal digits), as per\
+        * tolerance: 1e-8 (8 decimal digits), as per \
             [PEP485](https://peps.python.org/pep-0485/#absolute-tolerance-default).
 
     Returns:
-        * None - if abs(value) > abs(tolerance)
+        * None: if abs(value) > abs(tolerance)
         * Error message, otherwise
     """
     absolute_tolerance = abs(tolerance)
@@ -139,3 +129,10 @@ def is_not_approx_zero(
             return 'Value is approximately zero.'
 
     return _checker
+
+
+NumericRules: dict[str, RuleWrapper[Numeric]] = {
+    "is_within_strict_int_range": is_within_strict_int_range,
+    "is_not_negative": is_not_negative,
+    "is_not_approx_zero": is_not_approx_zero,
+}

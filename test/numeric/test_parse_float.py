@@ -25,7 +25,7 @@ from rules.numeric import (Infinity, NegativeInfinity, NotANumber,
 class ParseFloatTest(unittest.TestCase):
 
     def setUp(self):
-        self.value_parser = parse_float()
+        self.value_parser = parse_float
         return super().setUp()
 
     def test_returns_callable(self):
@@ -73,14 +73,15 @@ class ParseFloatTest(unittest.TestCase):
 
     def test_string(self):
         # abc is not a number
-        self.assertIn('not a valid float', cast(str, self.value_parser("abc")))
+        with self.assertRaises(ValueError):
+            self.value_parser("abc")
 
     def test_alphanumeric_string(self):
         # 9xyz1 is not a number
-        self.assertIn('not a valid float', cast(str,
-                                                self.value_parser("9xyz1")))
+        with self.assertRaises(ValueError):
+            self.value_parser("9xyz1")
 
     def test_alphanumeric_string_with_leading_zeros(self):
         # 0xyz123 is not a number
-        self.assertIn('not a valid float',
-                      cast(str, self.value_parser("00xyz123")))
+        with self.assertRaises(ValueError):
+            self.value_parser("00xyz123")
