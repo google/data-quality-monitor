@@ -86,5 +86,5 @@ class BigQueryReadRowsTest(unittest.TestCase):
         rows = get_readrows_iterator(self.bqs_client,
                                      os.environ['GCP_PROJECT_ID'],
                                      os.environ['TEST_DATASET_ID'],
-                                     os.environ['TEST_TABLE_ID'])
+                                     os.environ['TEST_TABLE_NAME'])
         self.assertTrue(isinstance(rows, Iterable))

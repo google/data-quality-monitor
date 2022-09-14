@@ -30,7 +30,7 @@ SCOPES = ('https://www.googleapis.com/auth/bigquery',
 Credentials = Union[OAuthCredentials, ImpersonatedCredentials]
 
 
-class DataFormats(Enum):
+class DataFormat(Enum):
     """
     Data format for BigQuery Storage API input or output data.
 
@@ -41,28 +41,28 @@ class DataFormats(Enum):
     ARROW = 2
 
 
-def build_table_path(project_id: str, dataset_id: str, table_id: str) -> str:
+def build_table_path(project_id: str, dataset_id: str, table_name: str) -> str:
     """
     Builds a fully qualified BigQuery table path from its parts.
 
-    Arguments:
-        * project_id - Project ID
-        * dataset_id - Dataset ID
-        * table_id - Table ID
+    Args:
+        * project_id: GCP Project ID
+        * dataset_id: Dataset name
+        * table_name: Table name
 
     Returns:
         * Formatted table path
     """
-    return f"projects/{project_id}/datasets/{dataset_id}/tables/{table_id}"
+    return f"projects/{project_id}/datasets/{dataset_id}/tables/{table_name}"
 
 
 def get_default_credentials() -> OAuthCredentials:
     """
-    Get the application default credentials for BigQuery scopes, as per the\
+    Get the application default credentials for BigQuery scopes, as per the \
     [docs](https://cloud.google.com/docs/authentication/production#automatically).
 
     Returns:
-        * OAuth2 Credentials object
+        * OAuth2 Credentials
     """
     credentials, _ = default(scopes=SCOPES)
     return credentials
@@ -73,17 +73,17 @@ def get_service_account_credentials(
     service_account_email: str,
 ) -> ImpersonatedCredentials:
     """
-    Get impersonated credentials for a service account, for BigQuery scopes\
-    using valid source credentials, as per the\
+    Get impersonated credentials for a service account, for BigQuery scopes \
+    using valid source credentials, as per the \
     [docs](https://cloud.google.com/iam/docs/impersonating-service-accounts).
 
-    Arguments:
-        * source_credentials - Credentials for User having \
+    Args:
+        * source_credentials: Credentials for User having \
             "Service Account Token Creator" permission
-        * service_account_email - Email address of service account
+        * service_account_email: Email address of service account
 
     Returns:
-        * Impersonated Credentials object
+        * Impersonated Credentials
     """
     return ImpersonatedCredentials(source_credentials=source_credentials,
                                    target_principal=service_account_email,
@@ -93,12 +93,12 @@ def get_service_account_credentials(
 def get_bq_legacy_client(project_id: str,
                          credentials: Credentials) -> BigQueryLegacyClient:
     """
-    Get an authenticated BigQuery API client (legacy), as per the\
+    Get an authenticated BigQuery API client (legacy), as per the \
     [docs](https://googleapis.dev/python/bigquery/latest/index.html).
 
-    Arguments:
-        * project_id - Project ID
-        * credentials - Credentials for User having \
+    Args:
+        * project_id: GCP Project ID
+        * credentials: Credentials for User having \
             "BigQuery Data Viewer" permission
 
     Returns:
@@ -109,11 +109,11 @@ def get_bq_legacy_client(project_id: str,
 
 def get_bq_storage_read_client(credentials: Credentials) -> BigQueryReadClient:
     """
-    Get an authenticated BigQuery Storage API client, as per the\
+    Get an authenticated BigQuery Storage API client, as per the \
     [docs](https://cloud.google.com/python/docs/reference/bigquerystorage/latest).
 
-    Arguments:
-        * credentials - Credentials for User having \
+    Args:
+        * credentials: Credentials for User having \
             "BigQuery Data Viewer" & "BigQuery Read Session User" permissions
 
     Returns:
@@ -126,29 +126,33 @@ def get_readrows_iterator(
         bq_storage_read_client: BigQueryReadClient,
         project_id: str,
         dataset_id: str,
-        table_id: str,
+        table_name: str,
         columns: Union[Iterable[str], None] = None,
-        data_format: DataFormats = DataFormats.AVRO) -> Iterable[Mapping]:
+        data_format: DataFormat = DataFormat.AVRO) -> Iterable[Mapping]:
     """
     Get an Iterator of Row Mappings with the requested columns of the table,\
     using an authenticated BigQuery Storage API client.
 
-    Arguments:
-        * bq_storage_read_client - BigQuery Storage API client
-        * project_id - Project ID
-        * dataset_id - Dataset ID
-        * table_id - Table ID
-        * columns - List of columns to select
-        * data_format - Format to fetch data in
+    Note: Max read stream count is 1, as DQM parallelizes at the column level.
+
+    Args:
+        * bq_storage_read_client: BigQuery Storage API client
+        * project_id: GCP Project ID
+        * dataset_id: Dataset name
+        * table_name: Table name
+        * columns: List of columns to select
+        * data_format: Format to fetch data in, one of:
+            * DataFormat.AVRO
+            * DataFormat.ARROW
 
     Defaults:
-        * columns - None, i.e. select all columns
-        * data_format - AVRO, since it auto-parses to Dict
+        * columns: None, i.e. select all columns
+        * data_format: AVRO, since it auto-parses to Dict
 
     Returns:
         * Iterator of Row Mappings
     """
-    table_path = build_table_path(project_id, dataset_id, table_id)
+    table_path = build_table_path(project_id, dataset_id, table_name)
 
     requested_session = ReadSession(table=table_path,
                                     data_format=data_format.value,
