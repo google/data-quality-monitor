@@ -107,7 +107,7 @@ def is_not_approx_zero(
     tolerance of zero (0) i.e [0 - tolerance, 0 + tolerance].
 
     Defaults:
-        * tolerance: 1e-8 (8 decimal digits), as per \
+        * tolerance: 1e-8 (8 decimal digits), as per
             [PEP485](https://peps.python.org/pep-0485/#absolute-tolerance-default).
 
     Returns:

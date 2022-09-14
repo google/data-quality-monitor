@@ -10,3 +10,6 @@ venv/
 
 # Visual Studio Code
 .vscode
+
+# Debugging data
+debug/

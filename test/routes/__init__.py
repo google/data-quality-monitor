@@ -13,12 +13,3 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
-from flask import Flask
-from flask_pydantic import validate
-
-from routes.process_column import process_column
-
-dqm = Flask(__name__)
-
-dqm.route('/process_column', methods=['POST'])(validate()(process_column))

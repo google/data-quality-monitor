@@ -14,25 +14,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from typing import Optional, Set, Union
+from typing import List, Optional, Union
 
 from google.auth import default
 from google.auth.impersonated_credentials import \
     Credentials as ImpersonatedCredentials
 from google.oauth2.credentials import Credentials as OAuthCredentials
+from pydantic import BaseModel
 
 Credentials = Union[OAuthCredentials, ImpersonatedCredentials]
 
-GCP_SCOPES: Set[str] = {'https://www.googleapis.com/auth/cloud-platform'}
+GCP_SCOPES = ['https://www.googleapis.com/auth/cloud-platform']
 
 
-def get_default_credentials(scopes: Set[str] = set()) -> OAuthCredentials:
+class AuthConfig(BaseModel):
+    service_account_email: Optional[str]
+    scopes: Optional[List[str]]
+
+
+def get_default_credentials(scopes: List[str] = []) -> OAuthCredentials:
     """
-    Get the application default credentials for BigQuery scopes, as per the \
+    Get the application default credentials for BigQuery scopes, as per the
     [docs](https://cloud.google.com/docs/authentication/production#automatically).
 
     Args:
-        * scopes (optional): Set containing valid OAuth 2.0 \
+        * scopes (optional): List containing valid OAuth 2.0
             [scopes](https://developers.google.com/identity/protocols/oauth2/scopes)
 
     Note: The auth/cloud-platform scope is always used.
@@ -40,25 +46,24 @@ def get_default_credentials(scopes: Set[str] = set()) -> OAuthCredentials:
     Returns:
         * OAuth2 Credentials
     """
-    credentials, _ = default(scopes=tuple(GCP_SCOPES | scopes))
+    credentials, _ = default(scopes=GCP_SCOPES + scopes)
     return credentials
 
 
 def get_service_account_credentials(
-    source_credentials: OAuthCredentials,
-    service_account_email: str,
-    scopes: Set[str] = set()
-) -> ImpersonatedCredentials:
+        source_credentials: OAuthCredentials,
+        service_account_email: str,
+        scopes: List[str] = []) -> ImpersonatedCredentials:
     """
-    Get impersonated credentials for a service account, for BigQuery scopes \
-    using valid source credentials, as per the \
+    Get impersonated credentials for a service account, for BigQuery scopes
+    using valid source credentials, as per the
     [docs](https://cloud.google.com/iam/docs/impersonating-service-accounts).
 
     Args:
-        * source_credentials: Credentials for User having \
+        * source_credentials: Credentials for User having
             "Service Account Token Creator" permission
         * service_account_email: Email address of service account
-        * scopes (optional): Set containing valid OAuth 2.0 \
+        * scopes (optional): List containing valid OAuth 2.0
             [scopes](https://developers.google.com/identity/protocols/oauth2/scopes)
 
     Returns:
@@ -66,24 +71,30 @@ def get_service_account_credentials(
     """
     return ImpersonatedCredentials(source_credentials=source_credentials,
                                    target_principal=service_account_email,
-                                   target_scopes=tuple(GCP_SCOPES | scopes))
+                                   target_scopes=GCP_SCOPES + scopes)
 
 
-def get_credentials(
-    service_account_email: Optional[str],
-        scopes: Set[str] = set()) -> Credentials:
+def get_credentials(auth_config: Optional[AuthConfig]) -> Credentials:
     """
-    Get default credentials, or impersonated credentials if a service account \
-    is provided.
+    Get default credentials, or impersonated credentials if a service account
+    is provided, with the given scopes.
 
-    Args:
+    Args: AuthConfig, with:
         * service_account_email (optional): Email address of service account
-        * scopes (optional): Set containing valid OAuth 2.0 \
+        * scopes (optional): List containing valid OAuth 2.0
             [scopes](https://developers.google.com/identity/protocols/oauth2/scopes)
 
     Returns:
         * Default or Impersonated Credentials
     """
+    service_account_email = None
+    scopes = []
+    if auth_config:
+        if auth_config.service_account_email:
+            service_account_email = auth_config.service_account_email
+        if auth_config.scopes:
+            scopes = auth_config.scopes
+
     default_credentials = get_default_credentials(scopes)
 
     credentials: Credentials

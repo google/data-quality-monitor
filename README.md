@@ -86,6 +86,20 @@ export $(xargs <.env)
 python3 -m unittest
 ###############################
 
+# Run local debug server
+make server
+###############################
+functions_framework --debug --target app
+###############################
+
+# Make requests to local debug server
+make call
+###############################
+curl localhost:8080/<endpoint> \
+  -H "Content-Type: application/json" \
+  -d @<json_file>
+###############################
+
 # Run pre-commit checks
 make verify
 ###############################

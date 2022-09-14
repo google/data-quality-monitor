@@ -13,12 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from pydantic import BaseModel
 
-from flask import Flask
-from flask_pydantic import validate
 
-from routes.process_column import process_column
+class DQMResponse(BaseModel):
+    message: str
+    code: int
 
-dqm = Flask(__name__)
 
-dqm.route('/process_column', methods=['POST'])(validate()(process_column))
+class MalformedConfigError(ValueError):
+    """ Represents malformed configurations sent by a client."""
+    pass
+
+
+def handle_malformed_config(error: MalformedConfigError) -> DQMResponse:
+    return DQMResponse(message=str(error), code=400)

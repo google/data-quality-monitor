@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from typing import Any, Callable, TypeVar, Union
+from typing import Any, Callable, Dict, TypeVar, Union
 
 # Stand-in for "Type"
 T = TypeVar('T')
@@ -47,6 +47,8 @@ Example -
         except:
             raise ValueError('Failed to parse a value.')
 """
+
+ParsersMap = Dict[str, TypeParser]
 
 RuleOutput = Union[None, str]
 RuleChecker = Callable[[T], RuleOutput]
@@ -87,3 +89,4 @@ Example -
 """
 
 RuleWrapper = Callable[..., RuleChecker[T]]
+RulesMap = Dict[str, RuleWrapper]

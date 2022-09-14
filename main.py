@@ -15,7 +15,7 @@ limitations under the License.
 """
 from functions_wrapper import entrypoint
 
-from core.errors import MalformedConfigError, handle_malformed_config
+from core.http import MalformedConfigError, handle_malformed_config
 from dqm import dqm
 
 dqm.register_error_handler(MalformedConfigError, handle_malformed_config)

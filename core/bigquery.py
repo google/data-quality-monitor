@@ -23,7 +23,7 @@ from pydantic import BaseModel
 
 from .auth import Credentials
 
-BQ_SCOPES = ('https://www.googleapis.com/auth/bigquery')
+BQ_SCOPES = ['https://www.googleapis.com/auth/bigquery']
 
 
 class TableMetadata(BaseModel):
@@ -47,20 +47,20 @@ def build_table_path(metadata: TableMetadata) -> str:
     Returns:
         * Formatted table path
     """
-    return f"projects/{metadata.project_id}" + \
-        f"/datasets/{metadata.dataset_id}" + \
-        f"/tables/{metadata.table_name}"
+    return (f"projects/{metadata.project_id}"
+            f"/datasets/{metadata.dataset_id}"
+            f"/tables/{metadata.table_name}")
 
 
 def get_bq_legacy_client(project_id: str,
                          credentials: Credentials) -> BigQueryLegacyClient:
     """
-    Get an authenticated BigQuery API client (legacy), as per the \
+    Get an authenticated BigQuery API client (legacy), as per the
     [docs](https://googleapis.dev/python/bigquery/latest/index.html).
 
     Args:
         * project_id: GCP Project ID
-        * credentials: Credentials for User having \
+        * credentials: Credentials for User having
             "BigQuery Data Viewer" permission
 
     Returns:
@@ -71,11 +71,11 @@ def get_bq_legacy_client(project_id: str,
 
 def get_bq_storage_read_client(credentials: Credentials) -> BigQueryReadClient:
     """
-    Get an authenticated BigQuery Storage API client, as per the \
+    Get an authenticated BigQuery Storage API client, as per the
     [docs](https://cloud.google.com/python/docs/reference/bigquerystorage/latest).
 
     Args:
-        * credentials: Credentials for User having \
+        * credentials: Credentials for User having
             "BigQuery Data Viewer" & "BigQuery Read Session User" permissions
 
     Returns:
@@ -101,7 +101,7 @@ def get_readrows_iterator(
         columns: Optional[Iterable[str]] = None,
         data_format: DataFormat = DataFormat.AVRO) -> Iterable[Mapping]:
     """
-    Get an Iterator of Row Mappings with the requested columns of the table, \
+    Get an Iterator of Row Mappings with the requested columns of the table,
     using an authenticated BigQuery Storage API client.
 
     Note: Max read stream count is 1, as DQM parallelizes at the column level.
