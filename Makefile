@@ -5,6 +5,9 @@ VENV_DIRNAME = venv
 export VIRTUAL_ENV := $(abspath ${VENV_DIRNAME})
 export PATH := ${VIRTUAL_ENV}/bin:${PATH}
 
+export DEBUG_HOST=localhost
+export DEBUG_PORT=8080
+
 include .env
 export
 
@@ -20,10 +23,13 @@ Targets:
 	format				run code formatter
 	test				run unit tests
 	verify				run pre-commit checks
+	server				run local debug server
+	call				make requests to local debug server
+					Usage: ENDPOINT=route JSON=test.json make call
 endef
 export PROJECT_HELP_MSG
 
-.PHONY: help install uninstall clean lint format test verify
+.PHONY: help install uninstall clean lint format test verify server call
 
 help:
 	@echo "$$PROJECT_HELP_MSG"
@@ -66,3 +72,14 @@ test:
 
 verify:
 	pre-commit run --all-files
+
+server:
+	functions_framework --debug \
+		--host "$(DEBUG_HOST)" \
+		--port "$(DEBUG_PORT)" \
+		--target app
+
+call:
+	curl $(DEBUG_HOST):$(DEBUG_PORT)/$(ENDPOINT) \
+		-H "Content-Type: application/json" \
+		-d @$(JSON)
