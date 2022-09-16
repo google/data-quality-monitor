@@ -71,7 +71,7 @@ def get_service_account_credentials(
 
 def get_credentials(
     service_account_email: Optional[str],
-    scopes: Set[str] = set()) -> Credentials:
+        scopes: Set[str] = set()) -> Credentials:
     """
     Get default credentials, or impersonated credentials if a service account \
     is provided.
