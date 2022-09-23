@@ -1,0 +1,95 @@
+<<<<<<< PATCH SET (fcf0b9 add terraform deployment for storage bucket, cloud function )
+- init:
+    assign:
+      - project_id: $${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
+      - dqm_cloud_function_url: ${CLOUD-FUNCTION-URL}
+      - config_files_bucket: ${CLOUD-BUCKET-WITH-CONFIG-FILES}
+      - execution_id: $${sys.get_env("GOOGLE_CLOUD_WORKFLOW_EXECUTION_ID")}
+      - error_log: []
+
+- get_file_names_from_bucket:
+    call: googleapis.storage.v1.objects.list
+    args:
+        bucket: $${config_files_bucket}
+    result: bucket_metadata
+
+- verify_if_bucket_has_files:
+    try: 
+      assign:
+        - files: $${bucket_metadata.items}
+    except:
+      as: e
+      raise: $${"could not locate config files in bucket:" + config_files_bucket}
+
+- run_config_files_loop:
+    try:
+        parallel:
+            for:
+                value: file
+                in: $${bucket_metadata.items}
+                steps:
+                    - get_bucket_file_names:
+                        steps:
+                        - assignment:
+                            assign:
+                                - bucket: $${config_files_bucket}
+                                - name: $${file.name}
+                        - read_from_gcs:
+                            call: http.get
+                            args:
+                                url: $${"https://storage.googleapis.com/download/storage/v1/b/" + config_files_bucket + "/o/" + name}
+                                auth:
+                                    type: OAuth2
+                                query:
+                                    alt: media
+                            result: config_json_content
+
+                    - get_table_names:
+                        call: googleapis.bigquery.v2.jobs.query
+                        args:
+                            projectId: $${project_id}
+                            body:
+                                useLegacySql: false
+                                projectId: $${project_id}
+                                query: $${"SELECT table_name FROM " + config_json_content.body.dataset + ".INFORMATION_SCHEMA.TABLES WHERE table_name LIKE '" + config_json_content.body.table + "' ORDER BY table_name"}
+                        result: queryResult
+
+                    - table_loop:
+                        parallel:
+                            for:
+                                value: row
+                                in: $${queryResult.rows}
+                                steps:
+                                    - set_base_variables:
+                                        assign:
+                                            - dataset: $${config_json_content.body.dataset}
+                                            - table_name: $${row.f[0].v}
+                                    - column_loop:
+                                        parallel:
+                                            for:
+                                                value: column
+                                                in: $${keys(config_json_content.body.columns)}
+                                                steps:
+                                                    - call_cloud_function:
+                                                        call: http.post
+                                                        args:
+                                                            url: $${dqm_cloud_function_url}
+                                                            auth:
+                                                                type: OIDC
+                                                            body:
+                                                                project_id: $${project_id}
+                                                                dataset_name: $${dataset}
+                                                                table_name: $${table_name}
+                                                                column: $${column}
+                                                                rules: $${config_json_content.body.columns[column]}
+                                                                log_target_project_id: $${config_json_content.body.log_target_project_id}
+                                                                log_target_dataset: $${config_json_content.body.log_target_dataset}
+                                                                execution_id: $${execution_id}
+                                                                config_file: $${file}
+                                                        result: log_result
+    except: 
+        as: e
+        steps:
+            - add_error_to_list:
+                error_log: ${list.concat(error_log, e)}
+    return: ${error_log}
