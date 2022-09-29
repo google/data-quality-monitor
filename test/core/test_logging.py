@@ -15,64 +15,95 @@ limitations under the License.
 """
 
 import unittest
+from datetime import datetime
 from typing import Any
 
-from core.logging import Logger
+from core.bigquery import TableMetadata
+from core.logging import PrintLogger
 
 
-class LoggerTest(unittest.TestCase):
+class PrintLoggerTest(unittest.TestCase):
 
     def setUp(self):
-        table_id = '01_01_1980_export'
+
+        dqm_version_id = '1.0.0'
+        dqm_execution_id = '1234567890'
+        run_timestamp_utc = '2022-10-20T10:30:20.000001'
+
         project_id = 'test_project'
-        dataset_id = "test_dataset"
+        dataset_id = 'test_dataset'
+        table_name = '01_01_1980_export'
+
+        table_metadata = TableMetadata(project_id=project_id,
+                                       dataset_id=dataset_id,
+                                       table_name=table_name)
+        table_id = f"{project_id}.{dataset_id}.{table_name}"
+
         self.test_log: dict[str, Any] = {
-            "project_id":
-                project_id,
-            "dqm_instance_id":
-                '123456',
-            "dqm_execution_id":
-                '1663318447740',
-            "dataset_id":
-                dataset_id,
-            "log_type":
-                'DV360',
-            "full_table_id":
-                "projects/test_project/datasets/test_dataset/tables" +
-                "/01_01_1980_export",
-            "run_timestamp":
-                '01_01_1980',
+            "dqm_version_id": dqm_version_id,
+            "dqm_execution_id": dqm_execution_id,
+            "run_timestamp_utc": run_timestamp_utc,
+            "project_id": project_id,
+            "dataset_id": dataset_id,
+            "table_name": table_name,
+            "full_table_id": table_id
         }
-        self.logger = Logger(self.test_log['project_id'],
-                             self.test_log['dqm_instance_id'],
-                             self.test_log['dqm_execution_id'],
-                             self.test_log['log_type'],
-                             self.test_log['dataset_id'], table_id,
-                             self.test_log['run_timestamp'])
+
+        self.logger = PrintLogger()
+        self.logger.set_base_log(
+            dqm_version_id, dqm_execution_id, table_metadata,
+            datetime.fromisoformat(self.test_log['run_timestamp_utc']))
+
         return super().setUp()
 
     def test_initilization(self):
         # verifies if the test_log dict has been properly stored in the logger
-        self.assertEqual(self.logger.base_log, self.test_log)
+        self.assertEqual(self.logger._base_log, self.test_log)
 
-    def test_construct_log_message(self):
-        # test if detailed log message information is added and returned.
+    def test_build_system_message(self):
+        error = 'Something went wrong!'
+        self.test_log['log_type'] = 'system'
+        self.test_log['error'] = error
+
+        self.assertEqual(self.logger._build_system_message(error),
+                         self.test_log)
+
+    def test_build_parser_message(self):
+        column = 'name'
+        parser = 'parse_int'
+        value = 'not_a_name'
+
+        self.test_log['log_type'] = 'parser'
+        self.test_log['column'] = column
+        self.test_log['parser'] = parser
+        self.test_log['value'] = value
+
+        self.assertEqual(
+            self.logger._build_parser_message(column, parser, value),
+            self.test_log)
+
+    def test_build_rule_message(self):
         column = 'name'
         rule = 'isName'
         value = 'not_a_name'
+
+        self.test_log['log_type'] = 'rule'
         self.test_log['column'] = column
         self.test_log['rule'] = rule
         self.test_log['value'] = value
         self.test_log['rule_params'] = {}  # expect empty dict if no params
-        self.assertEqual(self.logger.construct_log_message(column, rule, value),
+
+        self.assertEqual(self.logger._build_rule_message(column, rule, value),
                          self.test_log)
 
         # add parameters
+
         params = {"min": 0, "max": 10}
+
         self.test_log['rule_params'] = params
+
         self.assertEqual(
-            self.logger.construct_log_message(column,
-                                              rule,
-                                              value,
-                                              rule_params=params),
-            self.test_log)
+            self.logger._build_rule_message(column,
+                                            rule,
+                                            value,
+                                            rule_params=params), self.test_log)

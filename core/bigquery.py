@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from datetime import datetime
 from enum import Enum
 from typing import Iterable, Mapping, Optional, cast
 
@@ -33,6 +34,35 @@ class TableMetadata(BaseModel):
     project_id: str
     dataset_id: str
     table_name: str
+
+
+def get_formatted_timestamp(dt: datetime) -> str:
+    """
+    Converts a datetime object into the BigQuery timestamp format, as per
+    [docs](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#current_timestamp).
+
+    Args:
+        * dt - datetime.datetime object
+
+    Returns:
+        * BQ ISO formatted timestamp
+    """
+    return dt.isoformat('T')
+
+
+def build_table_id(metadata: TableMetadata) -> str:
+    """
+    Builds a fully qualified BigQuery table id from its parts.
+
+    Args:
+        * project_id: GCP Project ID
+        * dataset_id: Dataset name
+        * table_name: Table name
+
+    Returns:
+        * Formatted table id
+    """
+    return f"{metadata.project_id}.{metadata.dataset_id}.{metadata.table_name}"
 
 
 def build_table_path(metadata: TableMetadata) -> str:

@@ -13,6 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from typing import Any
 
-__version_info__ = (0, 5, 0)
-__version__ = '.'.join(map(str, __version_info__))
+
+def get_function_name(function: Any) -> str:
+    """
+    Get the original name of a function, removing module paths.
+
+    Args:
+        * function: function instance
+
+    Returns:
+        * Actual name of function
+
+    """
+    return str(function.__qualname__.split('.')[0])

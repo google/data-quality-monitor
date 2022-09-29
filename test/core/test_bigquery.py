@@ -21,9 +21,12 @@ from collections.abc import Iterable
 from google.cloud.bigquery import Client as BigQueryLegacyClient
 from google.cloud.bigquery_storage import BigQueryReadClient
 
-from core.auth import (ImpersonatedCredentials, OAuthCredentials,
-                       get_default_credentials,
-                       get_service_account_credentials)
+from core.auth import (
+    ImpersonatedCredentials,
+    OAuthCredentials,
+    get_default_credentials,
+    get_service_account_credentials,
+)
 from core.bigquery import (TableMetadata, get_bq_legacy_client,
                            get_bq_storage_read_client, get_readrows_iterator)
 
