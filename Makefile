@@ -38,6 +38,7 @@ help:
 install:
 	python3 -m venv "$(VIRTUAL_ENV)"
 	pip install -r requirements.txt
+	pip install -r requirements-dev.txt
 	pre-commit install
 
 uninstall:
