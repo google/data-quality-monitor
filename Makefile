@@ -8,7 +8,7 @@ export PATH := ${VIRTUAL_ENV}/bin:${PATH}
 export DEBUG_HOST=localhost
 export DEBUG_PORT=8080
 
-include .env
+-include .env
 export
 
 define PROJECT_HELP_MSG
@@ -30,6 +30,7 @@ endef
 export PROJECT_HELP_MSG
 
 .PHONY: help install uninstall clean lint format test verify server call
+.IGNORE: clean lint format
 
 help:
 	@echo "$$PROJECT_HELP_MSG"
@@ -53,11 +54,9 @@ uninstall:
 	rm -rf "$(VIRTUAL_ENV)"
 
 clean:
-	find . \
-		-type f -name "*.py[co]" \
-		-o -type d -name __pycache__ \
-		-o -type d -name .mypy_cache \
-		-exec rm -rf {} +
+	find . -type f -name "*.py[co]" -delete
+	find . -type d -name __pycache__ -delete
+	find . -type d -name .mypy_cache -delete
 
 lint:
 	python3 -m flake8 .
