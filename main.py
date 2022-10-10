@@ -15,9 +15,11 @@ limitations under the License.
 """
 from functions_wrapper import entrypoint
 
-from core.http import MalformedConfigError, handle_malformed_config
+from core.http import (MalformedConfigError, handle_malformed_config,
+                       handle_server_error)
 from dqm import dqm
 
 dqm.register_error_handler(MalformedConfigError, handle_malformed_config)
+dqm.register_error_handler(Exception, handle_server_error)
 
 app = lambda request: entrypoint(dqm, request)  # noqa: E731

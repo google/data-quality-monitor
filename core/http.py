@@ -13,18 +13,53 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from pydantic import BaseModel
+from typing import TypedDict
+
+from flask.typing import ResponseReturnValue
 
 
-class DQMResponse(BaseModel):
+class DQMResponse(TypedDict):
+    """
+    DQM Standard HTTP response.
+
+    Args:
+        * message: Response message
+        * code: HTTP code
+    """
     message: str
     code: int
 
 
 class MalformedConfigError(ValueError):
-    """ Represents malformed configurations sent by a client."""
+    """
+    Represents an Error due to malformed configuration sent by a client.
+
+    Note: Inherits from ValueError.
+    """
     pass
 
 
-def handle_malformed_config(error: MalformedConfigError) -> DQMResponse:
+def handle_malformed_config(error: MalformedConfigError) -> ResponseReturnValue:
+    """
+    DQM Malformed Config Response.
+
+    Args:
+        * error: Config error
+
+    Returns:
+        * DQMResponse for the error with a 400 status code
+    """
     return DQMResponse(message=str(error), code=400)
+
+
+def handle_server_error(error: Exception) -> ResponseReturnValue:
+    """
+    DQM Server Error Response.
+
+    Args:
+        * error: Server error
+
+    Returns:
+        * DQMResponse for the error with a 500 status code
+    """
+    return DQMResponse(message=str(error), code=500)

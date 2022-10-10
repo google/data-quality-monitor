@@ -39,7 +39,16 @@ def process_row(row: Mapping[Any, Any]) -> None:
 
 def process_column(body: ProcessColumnRequest) -> DQMResponse:
     """
-    Process a given column from the specified table
+    Process a given column from the specified table.
+
+    Args:
+        * body: ProcessColumnRequest HTTP request body
+
+    Returns:
+        * DQMResponse for the run with a 200 status code
+
+    Raises:
+        * MalformedConfigError: if the request body was malformed
     """
 
     (parser, usable_rules) = map_parser_to_rules(body.column_config.parser)
