@@ -1,10 +1,23 @@
 data "archive_file" "zip_code_repo" {
   type        = "zip"
-  source_dir  = "../../src"
+  source_dir  = "../../"
   output_path = "../../dist/function-source.zip"
-  #   excludes = [
-  #     "./../python/.gcloudignore",
-  #   ]
+    excludes = [
+      "dist",
+      "deployment",
+      "test",
+      ".flake8",
+      ".gitignore",
+      ".pre-commit-config.yaml",
+      "CONTRIBUTING.md",
+      "example.env",
+      "LICENSE",
+      "Makefile",
+      "mypy.ini",
+      "pyproject.toml",
+      "requirements-dev.txt",
+      "README.md",
+    ]
 }
 resource "random_id" "bucket_prefix" {
   byte_length = 8
@@ -36,7 +49,7 @@ resource "google_storage_bucket_object" "cf_upload_object" {
 
 resource "google_cloudfunctions_function" "function" {
   name        = "data-quality-monitor"
-  description = "Data quality monitor function to check rules on biquery datasets"
+  description = "Data quality monitor function to check rules on biquery datasets and log violations"
   runtime     = "python39"
   region      = var.cloud_function_region
 
@@ -46,6 +59,6 @@ resource "google_cloudfunctions_function" "function" {
   source_archive_object = google_storage_bucket_object.cf_upload_object.name
   trigger_http          = true
   timeout               = 540
-  entry_point           = "/"
+  entry_point           = "app"
   service_account_email = google_service_account.main_account.email
 }

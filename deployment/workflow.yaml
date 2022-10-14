@@ -1,4 +1,3 @@
-<<<<<<< PATCH SET (fcf0b9 add terraform deployment for storage bucket, cloud function )
 - init:
     assign:
       - project_id: $${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
@@ -91,5 +90,8 @@
         as: e
         steps:
             - add_error_to_list:
-                error_log: ${list.concat(error_log, e)}
-    return: ${error_log}
+                assign:
+                  - error_log: $${list.concat(error_log, e)}
+
+- output:
+    return: $${error_log}
