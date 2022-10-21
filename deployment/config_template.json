@@ -7,9 +7,7 @@
   "table": "TABLE PATTERN",
   "columns": {
     "column_a": {
-      "parsers": [
-        "parse_float"
-      ],
+      "parser": "parse_float",
       "rules": {
         "is_not_negative": {},
         "is_within_strict_int_range": {
@@ -19,9 +17,7 @@
       }
     },
     "column_b": {
-      "parsers": [
-        "parse_int"
-      ],
+      "parser": "parse_int",
       "rules": {
         "is_pii": {},
         "is_within_strict_int_range": {
@@ -31,9 +27,7 @@
       }
     },
     "column_c": {
-      "parsers": [
-        "parse_float"
-      ],
+      "parser": "parse_float",
       "rules": {
         "is_not_negative": {},
         "is_within_strict_int_range": {
