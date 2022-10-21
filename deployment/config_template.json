@@ -4,6 +4,7 @@
   "dataset": "BIGQUERY-DATASET",
   "log_target_project_id": "BIGQUERY-DATASET-TO-STORE-LOGS",
   "log_target_dataset": "BIGQUERY-DATASET-TO-STORE-LOGS",
+  "log_target_table": "BIGQUERY-DATASET-TO-STORE-LOGS",
   "table": "TABLE PATTERN",
   "columns": {
     "column_a": {

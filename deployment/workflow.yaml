@@ -57,6 +57,15 @@
                                     alt: media
                             result: config_json_content
 
+                        - create_log_table_if_not_exists:
+                            call: googleapis.bigquery.v2.jobs.query
+                            args:
+                                projectId: $${config_json_content.body.log_target_project_id}
+                                body:
+                                    useLegacySql: false
+                                    projectId: $${project_id}
+                                    query: $${"CREATE TABLE IF NOT EXISTS " + config_json_content.body.log_target_dataset + "." +config_json_content.body.log_target_table + " (dqm_version_id STRING,dqm_execution_id STRING,run_timestamp_utc STRING,project_id STRING,dataset_id STRING,table_name STRING,full_table_id STRING,log_type STRING,column STRING,error STRING,parser STRING,rule STRING,rule_params JSON,value STRING)"}
+
                     - get_table_names:
                         call: googleapis.bigquery.v2.jobs.query
                         args:
