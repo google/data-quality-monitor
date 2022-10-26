@@ -17,7 +17,7 @@
       - project_id: $${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
       - dqm_cloud_function_url: ${CLOUD-FUNCTION-URL}
       - config_files_bucket: ${CLOUD-BUCKET-WITH-CONFIG-FILES}
-      - execution_id: $${sys.get_env("GOOGLE_CLOUD_WORKFLOW_EXECUTION_ID")}
+      - workflow_execution_id: $${sys.get_env("GOOGLE_CLOUD_WORKFLOW_EXECUTION_ID")}
       - error_log: []
 
 - get_file_names_from_bucket:
@@ -90,8 +90,8 @@
                                                             auth:
                                                                 type: OIDC
                                                             body:
-                                                                execution_id: $${execution_id}
-                                                                config_file: 
+                                                                workflow_execution_id: $${workflow_execution_id}
+                                                                config_file:
                                                                 source_table:
                                                                     project_id: $${project_id}
                                                                     dataset_id: $${dataset}

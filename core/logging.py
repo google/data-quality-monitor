@@ -30,7 +30,7 @@ class LogMessage(TypedDict, total=False):
     """
     # Common fields
     dqm_version_id: str
-    dqm_execution_id: str
+    workflow_execution_id: str
     run_timestamp_utc: str
 
     project_id: str
@@ -71,7 +71,7 @@ class Logger(ABC):
     def __init__(self, batch_size: Optional[int] = None) -> None:
         self._batch_size = batch_size or self.DEFAULT_BATCH_SIZE
 
-    def set_base_log(self, dqm_version_id: str, dqm_execution_id: str,
+    def set_base_log(self, dqm_version_id: str, workflow_execution_id: str,
                      table_metadata: TableMetadata,
                      run_dt_utc: datetime) -> None:
         """
@@ -79,7 +79,7 @@ class Logger(ABC):
 
         Args:
             * dqm_version_id: DQM version ID
-            * dqm_execution_id: DQM execution ID
+            * workflow_execution_id: Workflow execution ID
             * table_metadata: Source TableMetadata
             * run_dt_utc: UTC timestamp object
 
@@ -89,7 +89,7 @@ class Logger(ABC):
 
         self._base_log = LogMessage(
             dqm_version_id=dqm_version_id,
-            dqm_execution_id=dqm_execution_id,
+            workflow_execution_id=workflow_execution_id,
             project_id=table_metadata.project_id,
             dataset_id=table_metadata.dataset_id,
             table_name=table_metadata.table_name,

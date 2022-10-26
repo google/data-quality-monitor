@@ -30,7 +30,7 @@ from rules import map_parser_to_rules
 
 
 class ProcessColumnRequest(BaseModel):
-    execution_id: str = 'development'
+    workflow_execution_id: str = 'development'
     auth_config: Optional[AuthConfig]
     source_table: TableMetadata
     log_table: Optional[TableMetadata]
@@ -61,7 +61,7 @@ def process_column(body: ProcessColumnRequest) -> DQMResponse:
     else:
         logger = BigQueryLogger(body.log_table, body.auth_config)
 
-    logger.set_base_log(version_id, body.execution_id, body.source_table,
+    logger.set_base_log(version_id, body.workflow_execution_id, body.source_table,
                         now_utc)
 
     bq_storage_read_client = get_bq_storage_read_client(credentials)

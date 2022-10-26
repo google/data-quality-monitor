@@ -27,7 +27,7 @@ class PrintLoggerTest(unittest.TestCase):
     def setUp(self):
 
         dqm_version_id = '1.0.0'
-        dqm_execution_id = '1234567890'
+        workflow_execution_id = '1234567890'
         run_timestamp_utc = '2022-10-20T10:30:20.000001'
 
         project_id = 'test_project'
@@ -41,7 +41,7 @@ class PrintLoggerTest(unittest.TestCase):
 
         self.test_log: dict[str, Any] = {
             "dqm_version_id": dqm_version_id,
-            "dqm_execution_id": dqm_execution_id,
+            "workflow_execution_id": workflow_execution_id,
             "run_timestamp_utc": run_timestamp_utc,
             "project_id": project_id,
             "dataset_id": dataset_id,
@@ -51,7 +51,7 @@ class PrintLoggerTest(unittest.TestCase):
 
         self.logger = PrintLogger()
         self.logger.set_base_log(
-            dqm_version_id, dqm_execution_id, table_metadata,
+            dqm_version_id, workflow_execution_id, table_metadata,
             datetime.fromisoformat(self.test_log['run_timestamp_utc']))
 
         return super().setUp()
