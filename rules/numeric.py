@@ -17,7 +17,7 @@ limitations under the License.
 import math
 from typing import Any, Union
 
-from .common import RuleChecker, RuleOutput, RuleWrapper
+from .common import RuleChecker, RuleOutput, RulesMap
 
 # Define numeric value as either int or float
 Numeric = Union[int, float]
@@ -129,10 +129,3 @@ def is_not_approx_zero(
             return 'Value is approximately zero.'
 
     return _checker
-
-
-NumericRules: dict[str, RuleWrapper[Numeric]] = {
-    "is_within_strict_int_range": is_within_strict_int_range,
-    "is_not_negative": is_not_negative,
-    "is_not_approx_zero": is_not_approx_zero,
-}

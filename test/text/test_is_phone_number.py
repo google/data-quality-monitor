@@ -145,5 +145,3 @@ class IsPhoneNumber(unittest.TestCase):
         self.assertIsNone(self.rule_checker('test'))
         self.assertIsNone(self.rule_checker('23598734928057034978'))
         self.assertIsNone(self.rule_checker('00000000000'))
-        self.assertIsNone(self.rule_checker('test'))
-        self.assertIsNone(self.rule_checker('test'))

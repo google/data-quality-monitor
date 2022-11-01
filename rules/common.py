@@ -89,4 +89,4 @@ Example -
 """
 
 RuleWrapper = Callable[..., RuleChecker[T]]
-RulesMap = Dict[str, RuleWrapper]
+RulesMap = Dict[str, RuleWrapper[T]]

@@ -27,12 +27,12 @@ def func_mapper(funcs: List[Callable]) -> Dict[str, Callable]:
 Parsers: ParsersMap = func_mapper(
     [numeric.parse_float, numeric.parse_int, text.parse_str])
 
-NumericRules: RulesMap = func_mapper([
+NumericRules: RulesMap[numeric.Numeric] = func_mapper([
     numeric.is_not_approx_zero, numeric.is_not_negative,
     numeric.is_within_strict_int_range
 ])
 
-TextRules: RulesMap = func_mapper([
+TextRules: RulesMap[str] = func_mapper([
     text.contains_at_sign, text.fully_matches_regex, text.is_email,
     text.is_phone_number, text.search_regex
 ])
