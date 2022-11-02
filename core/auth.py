@@ -13,23 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from __future__ import annotations
 
-from typing import List, Optional, Union
+from typing import List, Union
 
 from google.auth import default
 from google.auth.impersonated_credentials import \
     Credentials as ImpersonatedCredentials
 from google.oauth2.credentials import Credentials as OAuthCredentials
-from pydantic import BaseModel
+from typing_extensions import NotRequired, TypedDict
 
 Credentials = Union[OAuthCredentials, ImpersonatedCredentials]
 
 GCP_SCOPES = ['https://www.googleapis.com/auth/cloud-platform']
 
 
-class AuthConfig(BaseModel):
-    service_account_email: Optional[str]
-    scopes: Optional[List[str]]
+class AuthConfig(TypedDict):
+    service_account_email: NotRequired[str]
+    scopes: NotRequired[List[str]]
 
 
 def get_default_credentials(scopes: List[str] = []) -> OAuthCredentials:
@@ -74,7 +75,7 @@ def get_service_account_credentials(
                                    target_scopes=GCP_SCOPES + scopes)
 
 
-def get_credentials(auth_config: Optional[AuthConfig]) -> Credentials:
+def get_credentials(auth_config: AuthConfig | None) -> Credentials:
     """
     Get default credentials, or impersonated credentials if a service account
     is provided, with the given scopes.
@@ -90,10 +91,8 @@ def get_credentials(auth_config: Optional[AuthConfig]) -> Credentials:
     service_account_email = None
     scopes = []
     if auth_config:
-        if auth_config.service_account_email:
-            service_account_email = auth_config.service_account_email
-        if auth_config.scopes:
-            scopes = auth_config.scopes
+        service_account_email = auth_config.get('service_account_email', '')
+        scopes = auth_config.get('scopes', [])
 
     default_credentials = get_default_credentials(scopes)
 

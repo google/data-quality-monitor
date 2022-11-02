@@ -13,11 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
-from typing import Any, List, Optional, Sequence, TypedDict, cast
+from typing import Any, List, Sequence, cast
+
+from typing_extensions import TypedDict
 
 from core.auth import AuthConfig, get_credentials
 from core.bigquery import (BigQueryLegacyClient, TableMetadata, build_table_id,
@@ -68,7 +71,7 @@ class Logger(ABC):
 
     _messages: List[LogMessage] = []
 
-    def __init__(self, batch_size: Optional[int] = None) -> None:
+    def __init__(self, batch_size: int | None = None) -> None:
         self._batch_size = batch_size or self.DEFAULT_BATCH_SIZE
 
     def set_base_log(self, dqm_version_id: str, workflow_execution_id: str,
@@ -90,9 +93,9 @@ class Logger(ABC):
         self._base_log = LogMessage(
             dqm_version_id=dqm_version_id,
             workflow_execution_id=workflow_execution_id,
-            project_id=table_metadata.project_id,
-            dataset_id=table_metadata.dataset_id,
-            table_name=table_metadata.table_name,
+            project_id=table_metadata['project_id'],
+            dataset_id=table_metadata['dataset_id'],
+            table_name=table_metadata['table_name'],
             full_table_id=build_table_id(table_metadata),
             run_timestamp_utc=get_formatted_timestamp(run_dt_utc))
 
@@ -304,12 +307,12 @@ class BigQueryLogger(Logger):
 
     def __init__(self,
                  table_metadata: TableMetadata,
-                 auth_config: Optional[AuthConfig] = None,
-                 batch_size: Optional[int] = None) -> None:
+                 auth_config: AuthConfig | None = None,
+                 batch_size: int | None = None) -> None:
         self._table_id = build_table_id(table_metadata)
 
         credentials = get_credentials(auth_config)
-        self._bq_client = get_bq_legacy_client(table_metadata.project_id,
+        self._bq_client = get_bq_legacy_client(table_metadata['project_id'],
                                                credentials)
 
         return super().__init__(batch_size)

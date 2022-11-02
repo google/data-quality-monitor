@@ -13,21 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Iterable, Mapping, Optional, cast
+from typing import Iterable, Mapping, cast
 
 from google.cloud.bigquery import Client as BigQueryLegacyClient
 from google.cloud.bigquery_storage import BigQueryReadClient, ReadSession
-from pydantic import BaseModel
+from typing_extensions import TypedDict
 
 from .auth import Credentials
 
 BQ_SCOPES = ['https://www.googleapis.com/auth/bigquery']
 
 
-class TableMetadata(BaseModel):
+class TableMetadata(TypedDict):
     """
     Represents the necessary metadata to locate a BigQuery table.
     """
@@ -62,7 +63,9 @@ def build_table_id(metadata: TableMetadata) -> str:
     Returns:
         * Formatted table id
     """
-    return f"{metadata.project_id}.{metadata.dataset_id}.{metadata.table_name}"
+    return (f"{metadata['project_id']}"
+            f".{metadata['dataset_id']}"
+            f".{metadata['table_name']}")
 
 
 def build_table_path(metadata: TableMetadata) -> str:
@@ -77,9 +80,9 @@ def build_table_path(metadata: TableMetadata) -> str:
     Returns:
         * Formatted table path
     """
-    return (f"projects/{metadata.project_id}"
-            f"/datasets/{metadata.dataset_id}"
-            f"/tables/{metadata.table_name}")
+    return (f"projects/{metadata['project_id']}"
+            f"/datasets/{metadata['dataset_id']}"
+            f"/tables/{metadata['table_name']}")
 
 
 def get_bq_legacy_client(project_id: str,
@@ -128,7 +131,7 @@ class DataFormat(Enum):
 def get_readrows_iterator(
         bq_storage_read_client: BigQueryReadClient,
         table_metadata: TableMetadata,
-        columns: Optional[Iterable[str]] = None,
+        columns: Iterable[str] | None = None,
         data_format: DataFormat = DataFormat.AVRO) -> Iterable[Mapping]:
     """
     Get an Iterator of Row Mappings with the requested columns of the table,
@@ -139,7 +142,7 @@ def get_readrows_iterator(
     Args:
         * bq_storage_read_client: BigQuery Storage API client
         * table_metadata: TableMetadata object
-        * columns: List of columns to select
+        * columns (optional): List of columns to select
         * data_format: Format to fetch data in, one of:
             * DataFormat.AVRO
             * DataFormat.ARROW
@@ -158,7 +161,7 @@ def get_readrows_iterator(
                                     read_options={"selected_fields": columns})
 
     session = bq_storage_read_client.create_read_session(
-        parent=f"projects/{table_metadata.project_id}",
+        parent=f"projects/{table_metadata['project_id']}",
         read_session=requested_session,
         max_stream_count=1,
     )

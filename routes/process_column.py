@@ -50,9 +50,6 @@ def process_column(body: ProcessColumnRequest) -> DQMResponse:
     Raises:
         * MalformedConfigError: if the request body was malformed
     """
-    version_id = __version__
-    now_utc = datetime.utcnow()
-
     credentials = get_credentials(body.auth_config)
 
     logger: Logger
@@ -61,16 +58,16 @@ def process_column(body: ProcessColumnRequest) -> DQMResponse:
     else:
         logger = BigQueryLogger(body.log_table, body.auth_config)
 
-    logger.set_base_log(version_id, body.workflow_execution_id, body.source_table,
-                        now_utc)
+    logger.set_base_log(__version__, body.workflow_execution_id,
+                        body.source_table, datetime.utcnow())
 
     bq_storage_read_client = get_bq_storage_read_client(credentials)
 
-    (parser, usable_rules) = map_parser_to_rules(body.column_config.parser)
+    (parser, usable_rules) = map_parser_to_rules(body.column_config['parser'])
 
-    rules = generate_selected_rules(body.column_config.rules, usable_rules)
+    rules = generate_selected_rules(body.column_config['rules'], usable_rules)
 
-    column_name = body.column_config.column
+    column_name = body.column_config['column']
 
     rows_iterator = get_readrows_iterator(bq_storage_read_client,
                                           body.source_table,

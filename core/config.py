@@ -13,20 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 from typing import Any, Dict, List
 
-from pydantic import BaseModel
+from typing_extensions import NotRequired, TypedDict
 
 from rules.common import RuleChecker, RulesMap
 
 
-class RuleConfig(BaseModel):
+class RuleConfig(TypedDict):
     rule: str
-    args: Dict[str, Any] = {}
+    args: NotRequired[Dict[str, Any]]
 
 
-class ColumnConfig(BaseModel):
+class ColumnConfig(TypedDict):
     column: str
     parser: str
     rules: List[RuleConfig]
@@ -51,9 +50,10 @@ def generate_selected_rules(rule_configs: List[RuleConfig],
     selected_rules: List[RuleChecker] = []
 
     for rule_config in rule_configs:
-        if rule_config.rule not in rules:
+        if rule_config['rule'] not in rules:
             raise ValueError('Invalid rule specified.')
         else:
-            selected_rules.append(rules[rule_config.rule](**rule_config.args))
+            args = rule_config.get('args', {})
+            selected_rules.append(rules[rule_config['rule']](**args))
 
     return selected_rules
