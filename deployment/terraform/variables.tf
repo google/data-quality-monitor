@@ -22,8 +22,3 @@ variable "cloud_function_region" {
   type        = string
   description = "region where to deploy the cloud function"
 }
-
-variable "config_bucket" {
-  type        = string
-  description = "cloud storage bucket where the config file will reside"
-}

@@ -1,41 +1,35 @@
 {
-  "service_account_email": "SERVICE_ACCOUNT_EMAIL",
-  "project_id": "YOUR-GCP-PROJECT-ID",
-  "dataset": "BIGQUERY-DATASET",
-  "log_target_project_id": "BIGQUERY-DATASET-TO-STORE-LOGS",
-  "log_target_dataset": "BIGQUERY-DATASET-TO-STORE-LOGS",
-  "log_target_table": "BIGQUERY-DATASET-TO-STORE-LOGS",
-  "table": "TABLE PATTERN",
-  "columns": {
-    "column_a": {
-      "parser": "parse_float",
-      "rules": {
-        "is_not_negative": {},
-        "is_within_strict_int_range": {
-          "lower_bound": 1,
-          "upper_bound": 10
-        }
-      }
-    },
-    "column_b": {
-      "parser": "parse_int",
-      "rules": {
-        "is_pii": {},
-        "is_within_strict_int_range": {
-          "lower_bound": 1,
-          "upper_bound": 10
-        }
-      }
-    },
-    "column_c": {
-      "parser": "parse_float",
-      "rules": {
-        "is_not_negative": {},
-        "is_within_strict_int_range": {
-          "lower_bound": 1,
-          "upper_bound": 10
-        }
+    "service_account_email": "SERVICE_ACCOUNT_EMAIL",
+    "project_id": "YOUR-GCP-PROJECT-ID",
+    "dataset": "BIGQUERY-DATASET",
+    "log_target_project_id": "BIGQUERY-PROJECT-TO-STORE-LOGS",
+    "log_target_dataset": "BIGQUERY-DATASET-TO-STORE-LOGS",
+    "log_target_table": "BIGQUERY-TABLE-TO-STORE-LOGS",
+    "table": "STRING-TO-FILTER-ON-IN-TABLE-NAME",
+    "columns": {
+      "COLUMN-A-NAME": {
+        "parser": "parse_int",
+        "rules": [
+          {
+            "rule": "is_within_strict_int_range",
+            "args": {
+              "lower_bound": 0,
+              "upper_bound": 1
+            }
+          }
+        ]
+      },
+      "COLUMN-B-NAME": {
+        "parser": "parse_float",
+        "rules": [
+          {
+            "rule": "is_within_strict_int_range",
+            "args": {
+              "lower_bound": -1,
+              "upper_bound": 1
+            }
+          }
+        ]
       }
     }
   }
-}
