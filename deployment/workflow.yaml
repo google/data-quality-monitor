@@ -35,91 +35,103 @@
       raise: $${"could not locate config files in bucket:" + config_files_bucket}
 
 - run_config_files_loop:
-    try:
-        parallel:
-            for:
-                value: file
-                in: $${bucket_metadata.items}
-                steps:
-                    - get_bucket_file_names:
-                        steps:
-                        - assignment:
-                            assign:
-                                - bucket: $${config_files_bucket}
-                                - name: $${file.name}
-                        - read_from_gcs:
-                            call: http.get
-                            args:
-                                url: $${"https://storage.googleapis.com/download/storage/v1/b/" + config_files_bucket + "/o/" + name}
-                                auth:
-                                    type: OAuth2
-                                query:
-                                    alt: media
-                            result: config_json_content
+      for:
+          value: file
+          in: $${bucket_metadata.items}
+          steps:
+              - get_bucket_file_names:
+                  steps:
+                  - assignment:
+                      assign:
+                          - bucket: $${config_files_bucket}
+                          - name: $${file.name}
+                  - read_from_gcs:
+                      call: http.get
+                      args:
+                          url: $${"https://storage.googleapis.com/download/storage/v1/b/" + config_files_bucket + "/o/" + name}
+                          auth:
+                              type: OAuth2
+                          query:
+                              alt: media
+                      result: config_json_content
 
-                        - create_log_table_if_not_exists:
-                            call: googleapis.bigquery.v2.jobs.query
-                            args:
-                                projectId: $${config_json_content.body.log_target_project_id}
-                                body:
-                                    useLegacySql: false
-                                    projectId: $${project_id}
-                                    query: $${"CREATE TABLE IF NOT EXISTS " + config_json_content.body.log_target_dataset + "." +config_json_content.body.log_target_table + " (dqm_version_id STRING,dqm_execution_id STRING,run_timestamp_utc STRING,project_id STRING,dataset_id STRING,table_name STRING,full_table_id STRING,log_type STRING,column STRING,error STRING,parser STRING,rule STRING,rule_params JSON,value STRING)"}
+                  - create_log_table_if_not_exists:
+                      call: googleapis.bigquery.v2.jobs.query
+                      args:
+                          projectId: $${config_json_content.body.log_target_project_id}
+                          body:
+                              useLegacySql: false
+                              projectId: $${project_id}
+                              query: $${"CREATE TABLE IF NOT EXISTS " + config_json_content.body.log_target_dataset + "." +config_json_content.body.log_target_table + " (dqm_version_id STRING,dqm_execution_id STRING,run_timestamp_utc STRING,project_id STRING,dataset_id STRING,table_name STRING,full_table_id STRING,log_type STRING,column STRING,error STRING,parser STRING,rule STRING,rule_params JSON,value STRING)"}
 
-                    - get_table_names:
-                        call: googleapis.bigquery.v2.jobs.query
-                        args:
-                            projectId: $${project_id}
-                            body:
-                                useLegacySql: false
-                                projectId: $${project_id}
-                                query: $${"SELECT table_name FROM " + config_json_content.body.dataset + ".INFORMATION_SCHEMA.TABLES WHERE table_name LIKE '" + config_json_content.body.table + "' ORDER BY table_name"}
-                        result: queryResult
+              - get_table_names:
+                  call: googleapis.bigquery.v2.jobs.query
+                  args:
+                      projectId: $${project_id}
+                      body:
+                          useLegacySql: false
+                          projectId: $${project_id}
+                          query: $${"SELECT table_name FROM " + config_json_content.body.dataset + ".INFORMATION_SCHEMA.TABLES WHERE table_name LIKE '" + config_json_content.body.table + "' ORDER BY table_name"}
+                  result: queryResult
 
-                    - table_loop:
-                        parallel:
-                            for:
-                                value: row
-                                in: $${queryResult.rows}
-                                steps:
-                                    - set_base_variables:
-                                        assign:
-                                            - dataset: $${config_json_content.body.dataset}
-                                            - table_name: $${row.f[0].v}
-                                    - column_loop:
-                                        parallel:
-                                            for:
-                                                value: column
-                                                in: $${keys(config_json_content.body.columns)}
-                                                steps:
-                                                    - call_cloud_function:
-                                                        call: http.post
-                                                        args:
-                                                            url: $${dqm_cloud_function_url}
-                                                            auth:
-                                                                type: OIDC
-                                                            body:
-                                                                workflow_execution_id: $${workflow_execution_id}
-                                                                config_file:
-                                                                source_table:
-                                                                    project_id: $${project_id}
-                                                                    dataset_id: $${dataset}
-                                                                    table_name: $${table_name}
-                                                                log_table:
-                                                                    project_id: $${config_json_content.body.log_target_project_id}
-                                                                    dataset_id: $${config_json_content.body.log_target_dataset}
-                                                                    table_name:
-                                                                column_config:
-                                                                    column: $${column}
-                                                                    parser: $${config_json_content.body.columns[column].parsers}
-                                                                    rules: $${config_json_content.body.columns[column].rules}
-                                                        result: log_result
-    except:
-        as: e
-        steps:
-            - add_error_to_list:
-                assign:
-                  - error_log: $${list.concat(error_log, e)}
-
-- output:
-    return: $${error_log}
+              - table_loop:
+                  parallel:
+                      for:
+                          value: row
+                          in: $${queryResult.rows}
+                          steps:
+                              - set_base_variables:
+                                  assign:
+                                      - dataset: $${config_json_content.body.dataset}
+                                      - table_name: $${row.f[0].v}
+                              - column_loop:
+                                  parallel:
+                                      for:
+                                          value: column
+                                          in: $${keys(config_json_content.body.columns)}
+                                          steps:
+                                              - call_cloud_function:
+                                                  try:
+                                                      steps:
+                                                          - construct_request:
+                                                              assign:
+                                                                  - request_body:
+                                                                      workflow_execution_id: $${workflow_execution_id}
+                                                                      config_file: $${file.name}
+                                                                      source_table:
+                                                                          project_id: $${project_id}
+                                                                          dataset_id: $${dataset}
+                                                                          table_name: $${table_name}
+                                                                      log_table:
+                                                                          project_id: $${config_json_content.body.log_target_project_id}
+                                                                          dataset_id: $${config_json_content.body.log_target_dataset}
+                                                                          table_name: $${config_json_content.body.log_target_table}
+                                                                      column_config:
+                                                                          column: $${column}
+                                                                          parser: $${config_json_content.body.columns[column].parser}
+                                                                          rules: $${config_json_content.body.columns[column].rules}
+                                                          - post_to_cf:
+                                                              call: http.post
+                                                              args:
+                                                                  url: $${dqm_cloud_function_url + "/process_column"}
+                                                                  auth:
+                                                                      type: OIDC
+                                                                      audience: $${dqm_cloud_function_url}
+                                                                  body: request_body
+                                                              result: log_result
+                                                          - log_returned_result:
+                                                              call: sys.log
+                                                              args:
+                                                                  json: 
+                                                                      description: "Cloud Function call log"
+                                                                      response: $${log_result.body}
+                                                                      request: $${request_body}
+                                                                  severity: INFO
+                                                  except:
+                                                      as: e
+                                                      steps:
+                                                          - log_failed_requests:
+                                                              call: sys.log
+                                                              args:
+                                                                  json: $${e}
+                                                                  severity: WARNING
