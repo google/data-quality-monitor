@@ -20,8 +20,7 @@ from pydantic import BaseModel
 
 from core import __version__
 from core.auth import AuthConfig, get_credentials
-from core.bigquery import (TableMetadata, get_bq_storage_read_client,
-                           get_readrows_iterator)
+from core.bigquery import TableMetadata, get_bq_read_client, get_cells_iterator
 from core.config import ColumnConfig, generate_selected_rules
 from core.helpers import get_function_name
 from core.http import DQMResponse
@@ -61,7 +60,7 @@ def process_column(body: ProcessColumnRequest) -> DQMResponse:
     logger.set_base_log(__version__, body.workflow_execution_id,
                         body.source_table, datetime.utcnow())
 
-    bq_storage_read_client = get_bq_storage_read_client(credentials)
+    bq_read_client = get_bq_read_client(credentials)
 
     (parser, usable_rules) = map_parser_to_rules(body.column_config['parser'])
 
@@ -69,17 +68,15 @@ def process_column(body: ProcessColumnRequest) -> DQMResponse:
 
     column_name = body.column_config['column']
 
-    rows_iterator = get_readrows_iterator(bq_storage_read_client,
-                                          body.source_table,
-                                          columns=[column_name])
+    cells_iterator = get_cells_iterator(bq_read_client, body.source_table,
+                                        column_name)
 
     row_counter = 0
     parse_failures = 0
     rule_errors = 0
     check_violations = 0
 
-    for row in rows_iterator:
-        cell = row[column_name]
+    for cell in cells_iterator:
         try:
             value = parser(cell)
         except Exception as e:

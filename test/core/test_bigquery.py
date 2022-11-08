@@ -21,14 +21,11 @@ from collections.abc import Iterable
 from google.cloud.bigquery import Client as BigQueryLegacyClient
 from google.cloud.bigquery_storage import BigQueryReadClient
 
-from core.auth import (
-    ImpersonatedCredentials,
-    OAuthCredentials,
-    get_default_credentials,
-    get_service_account_credentials,
-)
+from core.auth import (ImpersonatedCredentials, OAuthCredentials,
+                       get_default_credentials,
+                       get_service_account_credentials)
 from core.bigquery import (TableMetadata, get_bq_legacy_client,
-                           get_bq_storage_read_client, get_readrows_iterator)
+                           get_bq_read_client, get_readrows_iterator)
 
 
 class BigQueryClientCredentialsTest(unittest.TestCase):
@@ -64,7 +61,7 @@ class BigQueryClientCredentialsTest(unittest.TestCase):
 
     def test_get_bq_storage_client_instance_with_default_account(self):
         default_credentials = get_default_credentials()
-        client = get_bq_storage_read_client(credentials=default_credentials)
+        client = get_bq_read_client(credentials=default_credentials)
         self.assertIsInstance(client, BigQueryReadClient)
 
     def test_get_bq_storage_client_instance_with_service_account(self):
@@ -72,7 +69,7 @@ class BigQueryClientCredentialsTest(unittest.TestCase):
         sa_credentials = get_service_account_credentials(
             service_account_email=os.environ['SERVICE_ACCOUNT_EMAIL'],
             source_credentials=default_credentials)
-        client = get_bq_storage_read_client(credentials=sa_credentials)
+        client = get_bq_read_client(credentials=sa_credentials)
         self.assertIsInstance(client, BigQueryReadClient)
 
 
@@ -83,7 +80,7 @@ class BigQueryReadRowsTest(unittest.TestCase):
         sa_credentials = get_service_account_credentials(
             service_account_email=os.environ['SERVICE_ACCOUNT_EMAIL'],
             source_credentials=default_credentials)
-        self.bqs_client = get_bq_storage_read_client(credentials=sa_credentials)
+        self.bqs_client = get_bq_read_client(credentials=sa_credentials)
         return super().setUp()
 
     def test_get_readrows_iterator(self):
