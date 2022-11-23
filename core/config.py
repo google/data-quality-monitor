@@ -56,4 +56,7 @@ def generate_selected_rules(rule_configs: List[RuleConfig],
             args = rule_config.get('args', {})
             selected_rules.append(rules[rule_config['rule']](**args))
 
+    if len(selected_rules) == 0:
+        raise ValueError('No rules specified.')
+
     return selected_rules

@@ -16,6 +16,7 @@ limitations under the License.
 from datetime import datetime
 from typing import Optional
 
+from flask.typing import ResponseReturnValue
 from pydantic import BaseModel
 
 from core import __version__
@@ -36,7 +37,7 @@ class ProcessColumnRequest(BaseModel):
     column_config: ColumnConfig
 
 
-def process_column(body: ProcessColumnRequest) -> DQMResponse:
+def process_column(body: ProcessColumnRequest) -> ResponseReturnValue:
     """
     Process a given column from the specified table.
 
@@ -112,9 +113,12 @@ def process_column(body: ProcessColumnRequest) -> DQMResponse:
 
     logger.flush(force=True)
 
+    if row_counter == 0:
+        raise RuntimeError('Source table was empty.')
+
     message = (f'DQM processed {row_counter} rows, with '
                f'{parse_failures} parse failures, '
                f'{rule_errors} rule errors, '
                f'{check_violations} rule check violations.')
 
-    return DQMResponse(message=message, code=200)
+    return (DQMResponse(name='', description=message, code=200), 200)

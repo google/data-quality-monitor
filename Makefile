@@ -80,6 +80,6 @@ server:
 		--target app
 
 call:
-	curl $(DEBUG_HOST):$(DEBUG_PORT)/$(ENDPOINT) \
+	curl -i $(DEBUG_HOST):$(DEBUG_PORT)/$(ENDPOINT) \
 		-H "Content-Type: application/json" \
 		-d @$(JSON)

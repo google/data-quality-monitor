@@ -13,8 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from __future__ import annotations
+
 from flask.typing import ResponseReturnValue
 from typing_extensions import TypedDict
+from werkzeug.exceptions import HTTPException
 
 
 class DQMResponse(TypedDict):
@@ -25,7 +28,8 @@ class DQMResponse(TypedDict):
         * message: Response message
         * code: HTTP code
     """
-    message: str
+    name: str | None
+    description: str | None
     code: int
 
 
@@ -48,7 +52,27 @@ def handle_malformed_config(error: MalformedConfigError) -> ResponseReturnValue:
     Returns:
         * DQMResponse for the error with a 400 status code
     """
-    return DQMResponse(message=str(error), code=400)
+    return (DQMResponse(name='MalformedConfigError',
+                        description=str(error),
+                        code=400), 400)
+
+
+def handle_http_error(error: HTTPException) -> ResponseReturnValue:
+    """
+    DQM HTTP Error Response.
+
+    Args:
+        * error: HTTP error
+
+    Returns:
+        * DQMResponse for the error with the relevant status code
+    """
+    code = error.code or 500
+    return (DQMResponse(
+        name=error.name,
+        description=error.description,
+        code=code,
+    ), code)
 
 
 def handle_server_error(error: Exception) -> ResponseReturnValue:
@@ -61,4 +85,6 @@ def handle_server_error(error: Exception) -> ResponseReturnValue:
     Returns:
         * DQMResponse for the error with a 500 status code
     """
-    return DQMResponse(message=str(error), code=500)
+    return (DQMResponse(name=error.__class__.__name__,
+                        description=str(error),
+                        code=500), 500)

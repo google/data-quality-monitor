@@ -14,12 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from functions_wrapper import entrypoint
+from werkzeug.exceptions import HTTPException
 
-from core.http import (MalformedConfigError, handle_malformed_config,
-                       handle_server_error)
+from core.http import (MalformedConfigError, handle_http_error,
+                       handle_malformed_config, handle_server_error)
 from dqm import dqm
 
 dqm.register_error_handler(MalformedConfigError, handle_malformed_config)
+dqm.register_error_handler(HTTPException, handle_http_error)
 dqm.register_error_handler(Exception, handle_server_error)
 
 app = lambda request: entrypoint(dqm, request)  # noqa: E731

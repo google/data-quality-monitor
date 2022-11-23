@@ -117,12 +117,15 @@ class Logger(ABC):
         if the set limit has been reached.
 
         Args:
-            * force: Flush even if the queue is below the size limit
+            * force: Flush if the queue has items, but is below the size limit
 
         Returns:
-            * Whether a flush occurred or not
+            * Boolean - Whether a flush occurred or not
         """
-        if (len(self._messages) >= self._batch_size) or force:
+        has_exceeded_batch_size = len(self._messages) >= self._batch_size
+        has_items_in_queue = len(self._messages) > 0
+
+        if has_exceeded_batch_size or (force and has_items_in_queue):
             self.send_log_messages(self._messages)
             self._messages = []
             return True
@@ -327,8 +330,8 @@ class BigQueryLogger(Logger):
         Returns:
             * None
         """
-        self._bq_client.insert_rows_json(self._table_id,
-                                         cast(Sequence[dict], messages))
+        self._bq_client.insert_rows_json(
+            self._table_id, cast(Sequence[dict], messages))
 
     def send_log_message(self, message: LogMessage) -> None:
         """
