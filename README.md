@@ -17,8 +17,12 @@ monitored for subsequent action. We also provide templates for common usecases.
 
 IAM Permissions:
 
-* BigQuery Data Viewer
+* BigQuery Data Editor
 * BigQuery Read Session User
+* BigQuery Resource Viewer
+* BigQuery User
+* Storage Object Viewer
+* Logging Log Writer
 
 ## Development
 

@@ -3,10 +3,14 @@ resource "google_service_account" "main_account" {
   display_name = "DQM Service Account"
 }
 
+locals {
+  service_account_full = "serviceAccount:${google_service_account.main_account.account_id}@${var.project_id}.iam.gserviceaccount.com"
+}
+
 resource "google_storage_bucket_iam_member" "member" {
   bucket = google_storage_bucket.config.name
   role   = "roles/storage.objectViewer"
-  member = "serviceAccount:${google_service_account.main_account.account_id}@${var.project_id}.iam.gserviceaccount.com"
+  member = local.service_account_full
 }
 
 resource "google_cloudfunctions_function_iam_member" "invoker" {
@@ -15,5 +19,41 @@ resource "google_cloudfunctions_function_iam_member" "invoker" {
   cloud_function = google_cloudfunctions_function.function.name
 
   role   = "roles/cloudfunctions.invoker"
-  member = "serviceAccount:${google_service_account.main_account.account_id}@${var.project_id}.iam.gserviceaccount.com"
+  member = local.service_account_full
+}
+
+resource "google_project_iam_binding" "bigquery_resource_viewer" {
+  project = var.project_id
+  role    = "roles/bigquery.resourceViewer"
+
+  members = [
+    local.service_account_full,
+  ]
+}
+
+resource "google_project_iam_binding" "bigquery_user" {
+  project = var.project_id
+  role    = "roles/bigquery.user"
+
+  members = [
+    local.service_account_full,
+  ]
+}
+
+resource "google_project_iam_binding" "bigquery_data_editor" {
+  project = var.project_id
+  role    = "roles/bigquery.dataEditor"
+
+  members = [
+    local.service_account_full,
+  ]
+}
+
+resource "google_project_iam_binding" "logs_writer" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+
+  members = [
+    local.service_account_full,
+  ]
 }
