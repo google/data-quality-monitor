@@ -47,8 +47,8 @@ def map_parser_to_rules(parser_name: str) -> Tuple[TypeParser, RulesMap]:
         * parser: string
 
     Returns: Tuple, with
-        * TypeParser - Func that parses Any to Type
-        * RulesMap - Dict of rule name to rule wrapper
+        * TypeParser: Func that parses Any to Type
+        * RulesMap: Dict of rule name to rule wrapper
 
     Raises:
         * ValueError: if non-existent parser name provided

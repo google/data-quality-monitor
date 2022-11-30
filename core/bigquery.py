@@ -43,7 +43,7 @@ def get_formatted_timestamp(dt: datetime) -> str:
     [docs](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#current_timestamp).
 
     Args:
-        * dt - datetime.datetime object
+        * dt: datetime.datetime object
 
     Returns:
         * BQ ISO formatted timestamp
