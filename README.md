@@ -11,11 +11,18 @@ It can act on any data sitting in Bigquery, including exports from various Googl
 file and scheduled as required. The output are logs that can be visualised and
 monitored for subsequent action. We also provide templates for common usecases.
 
-## Security
+## Deployment
 
-### Service Account
+### Requirements
 
-IAM Permissions:
+In order to deploy this solution you need:
+
+* GCP project with billing enabled 
+* Account with Project Editor permissions
+
+#### Service Account
+
+Upon deployment, DQM will give it's service account the following permissions:
 
 * BigQuery Data Editor
 * BigQuery Read Session User
@@ -23,6 +30,64 @@ IAM Permissions:
 * BigQuery User
 * Storage Object Viewer
 * Logging Log Writer
+
+### Steps
+
+Deployment of DQM is done through Terraform. Terraform is fully pre-installed in the Google Cloud Shell. Take the following steps to deploy DQM:
+
+1. Open the cloud project where you want to deploy the solution and open the Cloud Editor.
+2. In the terminal, run  ``` git clone https://github.com/gtech-professional-services/data-quality-monitor ```
+3. Run ``` cd data-quality-monitor/deployment/terraform ```
+4. Open /deployment/terraform/example.tfvars file and fill in your GCP project id. The other variables can be changed to your requirements.
+5. Run ``` terraform init```
+6. Run ``` terraform plan -var-file="example.tfvars" ```
+7. Run ``` terraform apply -var-file="example.tfvars" ```
+8. Wait for terraform to deploy DQM.
+
+### Configuration
+
+For DQM to know which table to scan for certain rules it uses configuration files in a Cloud Storage Bucket. config_template.json gives an example of what such files look like; they maintain the following structure:
+
+```json
+{
+    "service_account_email": "SERVICE-ACCOUNT-EMAIL",
+    "project_id": "YOUR-GCP-PROJECT-ID",
+    "dataset": "BIGQUERY-DATASET",
+    "log_target_project_id": "BIGQUERY-PROJECT-TO-STORE-LOGS",
+    "log_target_dataset": "BIGQUERY-DATASET-TO-STORE-LOGS",
+    "log_target_table": "BIGQUERY-TABLE-TO-STORE-LOGS",
+    "table": "STRING-TO-FILTER-ON-IN-TABLE-NAME",
+    "columns": {
+      "SOME-COLUMN-NAME": {
+        "parser": "SOME-PARSER-NAME",
+        "rules": [
+          {
+            "rule": "SOME-RULE-NAME",
+            "args": {
+              "SOME-RULE-ARG": 0,
+              "SOME-OTHER-RULE-ARG": 1
+            }
+          }
+        ]
+      },
+      "SOME-OTHER-COLUMN-NAME": {
+        "parser": "SOME-PARSER-NAME",
+        "rules": [
+          {
+            "rule": "SOME-RULE-NAME",
+            "args": {
+              "SOME-RULE-ARG": "[0-9]+"
+            }
+          }
+        ]
+      }
+    }
+  }
+```
+
+### Cloud Storage Terraform State Saving
+
+By default, Terraform saves state in the folder where it was deployed from, in this case that would be the Cloud Editor. As the Cloud Editor does not persist on a project level it is not possible for another user to manage the terraform deployed infrastructure. By taking additional steps the user can still save this state. In order to do this, complete a default deployment by following the steps above and followed the steps in gcs_backend_state.tf
 
 ## Development
 
