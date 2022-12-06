@@ -14,18 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from collections.abc import Iterable
 import os
 import unittest
-from collections.abc import Iterable
 
 from google.cloud.bigquery import Client as BigQueryLegacyClient
 from google.cloud.bigquery_storage import BigQueryReadClient
 
-from core.auth import (ImpersonatedCredentials, OAuthCredentials,
-                       get_default_credentials,
-                       get_service_account_credentials)
-from core.bigquery import (TableMetadata, get_bq_legacy_client,
-                           get_bq_read_client, get_readrows_iterator)
+from core.auth import get_default_credentials
+from core.auth import get_service_account_credentials
+from core.auth import ImpersonatedCredentials
+from core.auth import OAuthCredentials
+from core.bigquery import get_bq_legacy_client
+from core.bigquery import get_bq_read_client
+from core.bigquery import get_readrows_iterator
+from core.bigquery import TableMetadata
 
 
 class BigQueryClientCredentialsTest(unittest.TestCase):

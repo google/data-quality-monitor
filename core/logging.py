@@ -15,16 +15,21 @@ limitations under the License.
 """
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from datetime import datetime
 from enum import Enum
-from typing import Any, List, Sequence, cast
+from typing import Any, cast, List, Sequence
 
 from typing_extensions import TypedDict
 
-from core.auth import AuthConfig, get_credentials
-from core.bigquery import (BigQueryLegacyClient, TableMetadata, build_table_id,
-                           get_bq_legacy_client, get_formatted_timestamp)
+from core.auth import AuthConfig
+from core.auth import get_credentials
+from core.bigquery import BigQueryLegacyClient
+from core.bigquery import build_table_id
+from core.bigquery import get_bq_legacy_client
+from core.bigquery import get_formatted_timestamp
+from core.bigquery import TableMetadata
 
 
 class LogMessage(TypedDict, total=False):

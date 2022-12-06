@@ -16,8 +16,12 @@ limitations under the License.
 
 from typing import Callable, Dict, List, Tuple
 
-from . import numeric, text
-from .common import ParsersMap, RulesMap, RuleWrapper, TypeParser
+from . import numeric
+from . import text
+from .common import ParsersMap
+from .common import RulesMap
+from .common import RuleWrapper
+from .common import TypeParser
 
 
 def func_mapper(funcs: List[Callable]) -> Dict[str, Callable]:

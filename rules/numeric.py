@@ -17,7 +17,8 @@ limitations under the License.
 import math
 from typing import Any, Union
 
-from .common import RuleChecker, RuleOutput
+from .common import RuleChecker
+from .common import RuleOutput
 
 # Define numeric value as either int or float
 Numeric = Union[int, float]

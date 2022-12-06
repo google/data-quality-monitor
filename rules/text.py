@@ -17,7 +17,8 @@ limitations under the License.
 import re
 from typing import Any
 
-from .common import RuleChecker, RuleOutput
+from .common import RuleChecker
+from .common import RuleOutput
 
 
 def parse_str(value: Any) -> str:

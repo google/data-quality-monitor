@@ -14,10 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import unittest
 from typing import cast
+import unittest
 
-from rules.numeric import IEEE_TOLERANCE, is_not_approx_zero
+from rules.numeric import IEEE_TOLERANCE
+from rules.numeric import is_not_approx_zero
 
 
 class IsNotApproxZeroTest(unittest.TestCase):

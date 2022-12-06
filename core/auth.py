@@ -21,7 +21,8 @@ from google.auth import default
 from google.auth.impersonated_credentials import \
     Credentials as ImpersonatedCredentials
 from google.oauth2.credentials import Credentials as OAuthCredentials
-from typing_extensions import NotRequired, TypedDict
+from typing_extensions import NotRequired
+from typing_extensions import TypedDict
 
 Credentials = Union[OAuthCredentials, ImpersonatedCredentials]
 

@@ -20,12 +20,18 @@ from flask.typing import ResponseReturnValue
 from pydantic import BaseModel
 
 from core import __version__
-from core.auth import AuthConfig, get_credentials
-from core.bigquery import TableMetadata, get_bq_read_client, get_cells_iterator
-from core.config import ColumnConfig, generate_selected_rules
+from core.auth import AuthConfig
+from core.auth import get_credentials
+from core.bigquery import get_bq_read_client
+from core.bigquery import get_cells_iterator
+from core.bigquery import TableMetadata
+from core.config import ColumnConfig
+from core.config import generate_selected_rules
 from core.helpers import get_function_name
 from core.http import DQMResponse
-from core.logging import BigQueryLogger, Logger, PrintLogger
+from core.logging import BigQueryLogger
+from core.logging import Logger
+from core.logging import PrintLogger
 from rules import map_parser_to_rules
 
 

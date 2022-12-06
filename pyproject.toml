@@ -1,3 +1,6 @@
+[tool.isort]
+profile = "google"
+
 [tool.yapf]
 based_on_style = "google"
 

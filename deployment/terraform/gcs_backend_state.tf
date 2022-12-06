@@ -1,11 +1,11 @@
 # Links terraform to a cloud storage backend to manage Terraform state.
 # Conduct the following steps:
 # 1. Deploy DQM through regular terraform workflow; init, plan, deploy
-# 2. Note down the bucket name of the resource created in 
+# 2. Note down the bucket name of the resource created in
 # "google_storage_bucket.backend".
 # 3. Fill in the bucket name in terraform.backend.gcs below.
 # 4. Uncomment terraform.backend.gcs
-# 5. Reinitizalize terraform through terraform init and accept connection 
+# 5. Reinitizalize terraform through terraform init and accept connection
 # to GCS backend.
 
 resource "google_storage_bucket" "backend" {

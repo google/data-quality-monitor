@@ -17,10 +17,11 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Generator, Iterable, Mapping, cast
+from typing import Any, cast, Generator, Iterable, Mapping
 
 from google.cloud.bigquery import Client as BigQueryLegacyClient
-from google.cloud.bigquery_storage import BigQueryReadClient, ReadSession
+from google.cloud.bigquery_storage import BigQueryReadClient
+from google.cloud.bigquery_storage import ReadSession
 from typing_extensions import TypedDict
 
 from .auth import Credentials

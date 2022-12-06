@@ -15,11 +15,14 @@ limitations under the License.
 """
 
 import math
-import unittest
 from typing import cast
+import unittest
 
-from rules.numeric import (Infinity, NegativeInfinity, NotANumber,
-                           PositiveInfinity, parse_float)
+from rules.numeric import Infinity
+from rules.numeric import NegativeInfinity
+from rules.numeric import NotANumber
+from rules.numeric import parse_float
+from rules.numeric import PositiveInfinity
 
 
 class ParseFloatTest(unittest.TestCase):

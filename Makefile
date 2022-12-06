@@ -64,8 +64,8 @@ lint:
 	python3 -m mypy .
 
 format:
-	python3 -m yapf --parallel --recursive --in-place .
 	python3 -m isort --atomic .
+	python3 -m yapf --parallel --recursive --in-place .
 
 test:
 	python3 -m unittest $(ARGS)

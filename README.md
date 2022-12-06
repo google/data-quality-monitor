@@ -80,8 +80,8 @@ python3 -m mypy .
 # Format code
 make format
 ###############################
-python3 -m yapf --parallel --recursive --in-place .
 python3 -m isort --atomic .
+python3 -m yapf --parallel --recursive --in-place .
 ###############################
 
 # Run tests
@@ -114,11 +114,9 @@ pre-commit run --all-files
 # Cleanup environment
 make clean
 ###############################
-find . \
-  -type f -name "*.py[co]" \
-  -o -type d -name __pycache__ \
-  -o -type d -name .mypy_cache \
-  -exec rm -rf {} +
+find . -type f -name "*.py[co]" -delete
+find . -type d -name __pycache__ -delete
+find . -type d -name .mypy_cache -delete
 ###############################
 
 # Uninstall dev environment

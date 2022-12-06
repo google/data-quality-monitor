@@ -16,8 +16,10 @@ limitations under the License.
 from functions_wrapper import entrypoint
 from werkzeug.exceptions import HTTPException
 
-from core.http import (MalformedConfigError, handle_http_error,
-                       handle_malformed_config, handle_server_error)
+from core.http import handle_http_error
+from core.http import handle_malformed_config
+from core.http import handle_server_error
+from core.http import MalformedConfigError
 from dqm import dqm
 
 dqm.register_error_handler(MalformedConfigError, handle_malformed_config)

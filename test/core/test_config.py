@@ -14,11 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import unittest
 from typing import cast
+import unittest
 
-from core.config import RuleConfig, generate_selected_rules
-from rules import NumericRules, RulesMap, TextRules
+from core.config import generate_selected_rules
+from core.config import RuleConfig
+from rules import NumericRules
+from rules import RulesMap
+from rules import TextRules
 
 
 class GenerateSelectedRulesTest(unittest.TestCase):

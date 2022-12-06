@@ -16,7 +16,9 @@ limitations under the License.
 
 import unittest
 
-from rules import NumericRules, TextRules, map_parser_to_rules
+from rules import map_parser_to_rules
+from rules import NumericRules
+from rules import TextRules
 
 
 class MapParserToRulesTest(unittest.TestCase):

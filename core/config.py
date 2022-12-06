@@ -15,9 +15,11 @@ limitations under the License.
 """
 from typing import Any, Dict, List
 
-from typing_extensions import NotRequired, TypedDict
+from typing_extensions import NotRequired
+from typing_extensions import TypedDict
 
-from rules.common import RuleChecker, RulesMap
+from rules.common import RuleChecker
+from rules.common import RulesMap
 
 
 class RuleConfig(TypedDict):
