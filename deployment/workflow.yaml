@@ -110,6 +110,13 @@
                                                                           column: $${column}
                                                                           parser: $${config_json_content.body.columns[column].parser}
                                                                           rules: $${config_json_content.body.columns[column].rules}
+                                                         - log_request:
+                                                              call: sys.log
+                                                              args:
+                                                                  json:
+                                                                      description: "Cloud Function Request"
+                                                                      request: ${request_body}
+                                                                  severity: INFO
                                                           - post_to_cf:
                                                               call: http.post
                                                               args:
@@ -117,15 +124,14 @@
                                                                   auth:
                                                                       type: OIDC
                                                                       audience: $${dqm_cloud_function_url}
-                                                                  body: request_body
+                                                                  body: ${request_body}
                                                               result: log_result
-                                                          - log_returned_result:
+                                                          - log_response:
                                                               call: sys.log
                                                               args:
-                                                                  json:
-                                                                      description: "Cloud Function call log"
+                                                                  json: 
+                                                                      description: "Cloud Function Response"
                                                                       response: $${log_result.body}
-                                                                      request: $${request_body}
                                                                   severity: INFO
                                                   except:
                                                       as: e
