@@ -58,20 +58,20 @@
                   - create_log_table_if_not_exists:
                       call: googleapis.bigquery.v2.jobs.query
                       args:
-                          projectId: $${config_json_content.body.log_target_project_id}
+                          projectId: $${config_json_content.body.log_table.project_id}
                           body:
                               useLegacySql: false
                               projectId: $${project_id}
-                              query: $${"CREATE TABLE IF NOT EXISTS " + config_json_content.body.log_target_dataset + "." +config_json_content.body.log_target_table + " (dqm_version_id STRING,workflow_execution_id STRING,run_timestamp_utc STRING,project_id STRING,dataset_id STRING,table_name STRING,full_table_id STRING,log_type STRING,column STRING,error STRING,parser STRING,rule STRING,rule_params JSON,value STRING)"}
+                              query: $${"CREATE TABLE IF NOT EXISTS " + config_json_content.body.log_table.dataset_id + "." +config_json_content.body.log_table.table_name + " (dqm_version_id STRING,workflow_execution_id STRING,run_timestamp_utc STRING,project_id STRING,dataset_id STRING,table_name STRING,full_table_id STRING,log_type STRING,column STRING,error STRING,parser STRING,rule STRING,rule_params JSON,value STRING)"}
 
               - get_table_names:
                   call: googleapis.bigquery.v2.jobs.query
                   args:
-                      projectId: $${project_id}
+                      projectId: $${config_json_content.body.source_table.project_id}
                       body:
                           useLegacySql: false
                           projectId: $${project_id}
-                          query: $${"SELECT table_name FROM " + config_json_content.body.dataset + ".INFORMATION_SCHEMA.TABLES WHERE table_name LIKE '" + config_json_content.body.table + "' ORDER BY table_name"}
+                          query: $${"SELECT table_name FROM " + config_json_content.body.source_table.dataset_id + ".INFORMATION_SCHEMA.TABLES WHERE table_name LIKE '" + config_json_content.body.source_table.table_name + "' ORDER BY table_name"}
                   result: queryResult
 
               - table_loop:
@@ -82,7 +82,7 @@
                           steps:
                               - set_base_variables:
                                   assign:
-                                      - dataset: $${config_json_content.body.dataset}
+                                      - dataset_id: $${config_json_content.body.source_table.dataset_id}
                                       - table_name: $${row.f[0].v}
                               - column_loop:
                                   parallel:
@@ -91,53 +91,53 @@
                                           in: $${keys(config_json_content.body.columns)}
                                           steps:
                                               - call_cloud_function:
-                                                  try:
-                                                      steps:
-                                                          - construct_request:
-                                                              assign:
-                                                                  - request_body:
-                                                                      workflow_execution_id: $${workflow_execution_id}
-                                                                      config_file: $${file.name}
-                                                                      source_table:
-                                                                          project_id: $${project_id}
-                                                                          dataset_id: $${dataset}
-                                                                          table_name: $${table_name}
-                                                                      log_table:
-                                                                          project_id: $${config_json_content.body.log_target_project_id}
-                                                                          dataset_id: $${config_json_content.body.log_target_dataset}
-                                                                          table_name: $${config_json_content.body.log_target_table}
-                                                                      column_config:
-                                                                          column: $${column}
-                                                                          parser: $${config_json_content.body.columns[column].parser}
-                                                                          rules: $${config_json_content.body.columns[column].rules}
-                                                         - log_request:
-                                                              call: sys.log
-                                                              args:
-                                                                  json:
-                                                                      description: "Cloud Function Request"
-                                                                      request: ${request_body}
-                                                                  severity: INFO
-                                                          - post_to_cf:
-                                                              call: http.post
-                                                              args:
-                                                                  url: $${dqm_cloud_function_url + "/process_column"}
-                                                                  auth:
-                                                                      type: OIDC
-                                                                      audience: $${dqm_cloud_function_url}
-                                                                  body: ${request_body}
-                                                              result: log_result
-                                                          - log_response:
-                                                              call: sys.log
-                                                              args:
-                                                                  json: 
-                                                                      description: "Cloud Function Response"
-                                                                      response: $${log_result.body}
-                                                                  severity: INFO
-                                                  except:
-                                                      as: e
-                                                      steps:
-                                                          - log_failed_requests:
-                                                              call: sys.log
-                                                              args:
-                                                                  json: $${e}
-                                                                  severity: WARNING
+                                                    try:
+                                                        steps:
+                                                            - construct_request:
+                                                                assign:
+                                                                    - request_body:
+                                                                        workflow_execution_id: $${workflow_execution_id}
+                                                                        config_file: $${file.name}
+                                                                        source_table:
+                                                                            project_id: $${project_id}
+                                                                            dataset_id: $${dataset_id}
+                                                                            table_name: $${table_name}
+                                                                        log_table:
+                                                                            project_id: $${config_json_content.body.log_table.project_id}
+                                                                            dataset_id: $${config_json_content.body.log_table.dataset_id}
+                                                                            table_name: $${config_json_content.body.log_table.table_name}
+                                                                        column_config:
+                                                                            column: $${column}
+                                                                            parser: $${config_json_content.body.columns[column].parser}
+                                                                            rules: $${config_json_content.body.columns[column].rules}
+                                                            - log_request:
+                                                                call: sys.log
+                                                                args:
+                                                                    json:
+                                                                        description: "Cloud Function Request"
+                                                                        request: ${request_body}
+                                                                    severity: INFO
+                                                            - post_to_cf:
+                                                                call: http.post
+                                                                args:
+                                                                    url: $${dqm_cloud_function_url + "/process_column"}
+                                                                    auth:
+                                                                        type: OIDC
+                                                                        audience: $${dqm_cloud_function_url}
+                                                                    body: ${request_body}
+                                                                result: log_result
+                                                            - log_response:
+                                                                call: sys.log
+                                                                args:
+                                                                    json:
+                                                                        description: "Cloud Function Response"
+                                                                        response: $${log_result.body}
+                                                                    severity: INFO
+                                                    except:
+                                                        as: e
+                                                        steps:
+                                                            - log_failed_requests:
+                                                                call: sys.log
+                                                                args:
+                                                                    json: $${e}
+                                                                    severity: WARNING

@@ -17,7 +17,7 @@ monitored for subsequent action. We also provide templates for common usecases.
 
 In order to deploy this solution you need:
 
-* GCP project with billing enabled 
+* GCP project with billing enabled
 * Account with Project Editor permissions
 
 #### Service Account
@@ -50,39 +50,43 @@ For DQM to know which table to scan for certain rules it uses configuration file
 
 ```json
 {
-    "service_account_email": "SERVICE-ACCOUNT-EMAIL",
+  "service_account_email": "SERVICE-ACCOUNT-EMAIL",
+  "source_table": {
     "project_id": "YOUR-GCP-PROJECT-ID",
-    "dataset": "BIGQUERY-DATASET",
-    "log_target_project_id": "BIGQUERY-PROJECT-TO-STORE-LOGS",
-    "log_target_dataset": "BIGQUERY-DATASET-TO-STORE-LOGS",
-    "log_target_table": "BIGQUERY-TABLE-TO-STORE-LOGS",
-    "table": "STRING-TO-FILTER-ON-IN-TABLE-NAME",
-    "columns": {
-      "SOME-COLUMN-NAME": {
-        "parser": "SOME-PARSER-NAME",
-        "rules": [
-          {
-            "rule": "SOME-RULE-NAME",
-            "args": {
-              "SOME-RULE-ARG": 0,
-              "SOME-OTHER-RULE-ARG": 1
-            }
+    "dataset_id": "BIGQUERY-DATASET",
+    "table_name": "STRING-TO-FILTER-ON-IN-TABLE-NAME"
+  },
+  "log_table": {
+    "project_id": "BIGQUERY-PROJECT-TO-STORE-LOGS",
+    "dataset_id": "BIGQUERY-DATASET-TO-STORE-LOGS",
+    "table_name": "BIGQUERY-TABLE-TO-STORE-LOGS"
+  },
+  "columns": {
+    "SOME-COLUMN-NAME": {
+      "parser": "SOME-PARSER-NAME",
+      "rules": [
+        {
+          "rule": "SOME-RULE-NAME",
+          "args": {
+            "SOME-RULE-ARG": 0,
+            "SOME-OTHER-RULE-ARG": 1
           }
-        ]
-      },
-      "SOME-OTHER-COLUMN-NAME": {
-        "parser": "SOME-PARSER-NAME",
-        "rules": [
-          {
-            "rule": "SOME-RULE-NAME",
-            "args": {
-              "SOME-RULE-ARG": "[0-9]+"
-            }
+        }
+      ]
+    },
+    "SOME-OTHER-COLUMN-NAME": {
+      "parser": "SOME-PARSER-NAME",
+      "rules": [
+        {
+          "rule": "SOME-RULE-NAME",
+          "args": {
+            "SOME-RULE-ARG": "[0-9]+"
           }
-        ]
-      }
+        }
+      ]
     }
   }
+}
 ```
 
 ### Cloud Storage Terraform State Saving
