@@ -115,7 +115,7 @@
                                                                 args:
                                                                     json:
                                                                         description: "Cloud Function Request"
-                                                                        request: ${request_body}
+                                                                        request: $${request_body}
                                                                     severity: INFO
                                                             - post_to_cf:
                                                                 call: http.post
@@ -124,7 +124,7 @@
                                                                     auth:
                                                                         type: OIDC
                                                                         audience: $${dqm_cloud_function_url}
-                                                                    body: ${request_body}
+                                                                    body: $${request_body}
                                                                 result: log_result
                                                             - log_response:
                                                                 call: sys.log
