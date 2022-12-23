@@ -55,9 +55,9 @@ uninstall:
 	rm -rf "$(VIRTUAL_ENV)"
 
 clean:
-	find . -type f -name "*.py[co]" -delete
-	find . -type d -name __pycache__ -delete
-	find . -type d -name .mypy_cache -delete
+	find . -type f -name "*.py[co]" -prune -exec rm -rf "{}" \;
+	find . -type d -name __pycache__ -prune -exec rm -rf "{}" \;
+	find . -type d -name .mypy_cache -prune -exec rm -rf "{}" \;
 
 lint:
 	python3 -m flake8 .

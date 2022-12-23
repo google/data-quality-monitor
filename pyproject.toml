@@ -1,11 +1,33 @@
 [tool.isort]
 profile = "google"
 
+[tool.mypy]
+python_version = 3.9
+exclude = [
+    '.git/',       # git
+    'venv/',       # virtualenv
+]
+check_untyped_defs = true
+# Google libraries lack type hints
+disallow_any_unimported = false
+disallow_untyped_defs = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = 'test.*'
+# Reduce per-test boilerplate
+disallow_untyped_defs = false
+warn_return_any = false
+
 [tool.yapf]
 based_on_style = "google"
 
 [tool.yapfignore]
 ignore_patterns = [
   ".git",
-  "venv"
+  "venv",
 ]

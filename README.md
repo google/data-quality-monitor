@@ -39,7 +39,7 @@ Deployment of DQM is done through Terraform. Terraform is fully pre-installed in
 2. In the terminal, run  ``` git clone https://github.com/gtech-professional-services/data-quality-monitor ```
 3. Run ``` cd data-quality-monitor/deployment/terraform ```
 4. Open /deployment/terraform/example.tfvars file and fill in your GCP project id. The other variables can be changed to your requirements.
-5. Run ``` terraform init```
+5. Run ```terraform init```
 6. Run ``` terraform plan -var-file="example.tfvars" ```
 7. Run ``` terraform apply -var-file="example.tfvars" ```
 8. Wait for terraform to deploy DQM.
@@ -167,9 +167,9 @@ functions_framework --debug --target app
 ###############################
 
 # Make requests to local debug server
-make call
+ENDPOINT=/route make call
 ###############################
-curl localhost:8080/<endpoint> \
+curl localhost:8080/<endpoint-route> \
   -H "Content-Type: application/json" \
   -d @<json_file>
 ###############################
@@ -183,9 +183,9 @@ pre-commit run --all-files
 # Cleanup environment
 make clean
 ###############################
-find . -type f -name "*.py[co]" -delete
-find . -type d -name __pycache__ -delete
-find . -type d -name .mypy_cache -delete
+find . -type f -name "*.py[co]" -prune -exec rm -rf "{}" \;
+find . -type d -name __pycache__ -prune -exec rm -rf "{}" \;
+find . -type d -name .mypy_cache -prune -exec rm -rf "{}" \;
 ###############################
 
 # Uninstall dev environment
