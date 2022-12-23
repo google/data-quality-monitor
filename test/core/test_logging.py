@@ -71,30 +71,35 @@ class PrintLoggerTest(unittest.TestCase):
     def test_build_parser_message(self):
         column = 'name'
         parser = 'parse_int'
+        error = 'Not an int.'
         value = 'not_a_name'
 
         self.test_log['log_type'] = 'parser'
         self.test_log['column'] = column
         self.test_log['parser'] = parser
+        self.test_log['error'] = error
         self.test_log['value'] = value
 
         self.assertEqual(
-            self.logger._build_parser_message(column, parser, value),
+            self.logger._build_parser_message(column, parser, error, value),
             self.test_log)
 
     def test_build_rule_message(self):
         column = 'name'
         rule = 'isName'
+        error = 'Not a name.'
         value = 'not_a_name'
 
         self.test_log['log_type'] = 'rule'
         self.test_log['column'] = column
         self.test_log['rule'] = rule
+        self.test_log['error'] = error
         self.test_log['value'] = value
         self.test_log['rule_params'] = {}  # expect empty dict if no params
 
-        self.assertEqual(self.logger._build_rule_message(column, rule, value),
-                         self.test_log)
+        self.assertEqual(
+            self.logger._build_rule_message(column, rule, error, value),
+            self.test_log)
 
         # add parameters
 
@@ -105,5 +110,6 @@ class PrintLoggerTest(unittest.TestCase):
         self.assertEqual(
             self.logger._build_rule_message(column,
                                             rule,
+                                            error,
                                             value,
                                             rule_params=params), self.test_log)

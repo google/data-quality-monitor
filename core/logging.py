@@ -178,7 +178,7 @@ class Logger(ABC):
             error=error,
         )
 
-    def _build_parser_message(self, column: str, parser: str,
+    def _build_parser_message(self, column: str, parser: str, error: str,
                               value: Any) -> LogMessage:
         """
         Adds parser error information to base log message.
@@ -194,11 +194,13 @@ class Logger(ABC):
         return self._base_log.copy() | LogMessage(log_type=LogType.PARSER.value,
                                                   column=column,
                                                   parser=parser,
+                                                  error=error,
                                                   value=value)
 
     def _build_rule_message(self,
                             column: str,
                             rule: str,
+                            error: str,
                             value: Any,
                             rule_params: dict = {}) -> LogMessage:
         """
@@ -217,8 +219,9 @@ class Logger(ABC):
             log_type=LogType.RULE.value,
             column=column,
             rule=rule,
-            rule_params=rule_params,
+            error=error,
             value=value,
+            rule_params=rule_params,
         )
 
     def system(self, error: str) -> None:
@@ -236,7 +239,7 @@ class Logger(ABC):
         log = self._build_system_message(error)
         self.queue_log_message(log)
 
-    def parser(self, column: str, parser: str, value: Any) -> None:
+    def parser(self, column: str, parser: str, error: str, value: Any) -> None:
         """
         Adds parser error information to base log message and
         sends it to the logger for writing.
@@ -244,18 +247,20 @@ class Logger(ABC):
         Args:
             * column: column where the rule is applied
             * parser: parser function that failed and raises this message
+            * error: error that occurred
             * value: value that fails to parse
 
         Returns:
             * None
         """
 
-        log = self._build_parser_message(column, parser, value)
+        log = self._build_parser_message(column, parser, error, value)
         self.queue_log_message(log)
 
     def rule(self,
              column: str,
              rule: str,
+             error: str,
              value: Any,
              rule_params: dict = {}) -> None:
         """
@@ -265,6 +270,7 @@ class Logger(ABC):
         Args:
             * column: column where the rule is applied
             * rule: rule that is violated and raises this message
+            * error: error that occurred
             * value: value that violates the rule
             * rule_params: optional, parameters set for the rule
 
@@ -272,7 +278,7 @@ class Logger(ABC):
             * None
         """
 
-        log = self._build_rule_message(column, rule, value, rule_params)
+        log = self._build_rule_message(column, rule, error, value, rule_params)
         self.queue_log_message(log)
 
 

@@ -180,7 +180,7 @@ def get_readrows_iterator(
 
 def get_cells_iterator(bq_read_client: BigQueryReadClient,
                        table_metadata: TableMetadata,
-                       column: str) -> Generator[Iterable[Any], None, None]:
+                       column: str) -> Generator[Any, None, None]:
     """
     Get an Iterator of cell values with the requested columns of the table,
     using an authenticated BigQuery Storage API client.

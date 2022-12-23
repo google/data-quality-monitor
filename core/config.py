@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import json
 from typing import Any, Dict, List
 
 from typing_extensions import NotRequired
@@ -52,11 +53,15 @@ def generate_selected_rules(rule_configs: List[RuleConfig],
     selected_rules: List[RuleChecker] = []
 
     for rule_config in rule_configs:
-        if rule_config['rule'] not in rules:
+        rule_name = rule_config['rule']
+        if rule_name not in rules:
             raise ValueError('Invalid rule specified.')
         else:
             args = rule_config.get('args', {})
-            selected_rules.append(rules[rule_config['rule']](**args))
+            rule = rules[rule_name](**args)
+            rule._name = rule_name  # type: ignore[attr-defined]
+            rule._args = json.dumps(args)  # type: ignore[attr-defined]
+            selected_rules.append(rule)
 
     if len(selected_rules) == 0:
         raise ValueError('No rules specified.')

@@ -27,7 +27,6 @@ from core.bigquery import get_cells_iterator
 from core.bigquery import TableMetadata
 from core.config import ColumnConfig
 from core.config import generate_selected_rules
-from core.helpers import get_function_name
 from core.http import DQMResponse
 from core.logging import BigQueryLogger
 from core.logging import Logger
@@ -88,7 +87,7 @@ def process_column(body: ProcessColumnRequest) -> ResponseReturnValue:
             value = parser(cell)
         except Exception as e:
             # parsing failed
-            logger.parser(column_name, get_function_name(parser), str(e))
+            logger.parser(column_name, parser._name, str(e), cell)
             parse_failures += 1
         else:
             for rule in rules:
@@ -96,22 +95,14 @@ def process_column(body: ProcessColumnRequest) -> ResponseReturnValue:
                     result = rule(value)
                 except Exception as e:
                     # rule check failed
-                    logger.rule(
-                        column_name,
-                        get_function_name(rule),
-                        str(e),
-                        # TODO: Get actual params
-                        rule.__defaults__)  # type: ignore
+                    logger.rule(column_name, rule._name, str(e), value,
+                                rule._args)
                     rule_errors += 1
                 else:
                     if result is not None:
                         # rule check violated
-                        logger.rule(
-                            column_name,
-                            get_function_name(rule),
-                            result,
-                            # TODO: Get actual params
-                            rule.__defaults__)  # type: ignore
+                        logger.rule(column_name, rule._name, result, value,
+                                    rule._args)
                         check_violations += 1
 
         row_counter += 1
