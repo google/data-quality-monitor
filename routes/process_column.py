@@ -87,7 +87,7 @@ def process_column(body: ProcessColumnRequest) -> ResponseReturnValue:
             value = parser(cell)
         except Exception as e:
             # parsing failed
-            logger.parser(column_name, parser._name, str(e), cell)
+            logger.parser(column_name, parser.__name__, str(e), cell)
             parse_failures += 1
         else:
             for rule in rules:
@@ -95,14 +95,14 @@ def process_column(body: ProcessColumnRequest) -> ResponseReturnValue:
                     result = rule(value)
                 except Exception as e:
                     # rule check failed
-                    logger.rule(column_name, rule._name, str(e), value,
-                                rule._args)
+                    logger.rule(column_name, rule.__name__, str(e), value,
+                                rule.__kwdefaults__)
                     rule_errors += 1
                 else:
                     if result is not None:
                         # rule check violated
-                        logger.rule(column_name, rule._name, result, value,
-                                    rule._args)
+                        logger.rule(column_name, rule.__name__, result, value,
+                                    rule.__kwdefaults__)
                         check_violations += 1
 
         row_counter += 1

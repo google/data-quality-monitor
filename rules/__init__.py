@@ -72,6 +72,6 @@ def map_parser_to_rules(parser_name: str) -> Tuple[TypeParser, RulesMap]:
     else:
         raise ValueError("Invalid parser specified.")
 
-    parser._name = parser_name  # type: ignore[attr-defined]
+    parser.__name__ = parser_name
 
     return parser, usable_rules

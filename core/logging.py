@@ -19,6 +19,7 @@ from abc import ABC
 from abc import abstractmethod
 from datetime import datetime
 from enum import Enum
+import json
 from typing import Any, cast, List, Sequence
 
 from typing_extensions import TypedDict
@@ -53,7 +54,7 @@ class LogMessage(TypedDict, total=False):
     error: str
     parser: str
     rule: str
-    rule_params: dict
+    rule_params: str
     value: str
 
 
@@ -221,7 +222,7 @@ class Logger(ABC):
             rule=rule,
             error=error,
             value=value,
-            rule_params=rule_params,
+            rule_params=json.dumps(rule_params),
         )
 
     def system(self, error: str) -> None:

@@ -15,6 +15,7 @@ limitations under the License.
 """
 
 from datetime import datetime
+import json
 from typing import Any
 import unittest
 
@@ -95,7 +96,7 @@ class PrintLoggerTest(unittest.TestCase):
         self.test_log['rule'] = rule
         self.test_log['error'] = error
         self.test_log['value'] = value
-        self.test_log['rule_params'] = {}  # expect empty dict if no params
+        self.test_log['rule_params'] = '{}'  # expect empty dict if no params
 
         self.assertEqual(
             self.logger._build_rule_message(column, rule, error, value),
@@ -105,7 +106,28 @@ class PrintLoggerTest(unittest.TestCase):
 
         params = {"min": 0, "max": 10}
 
-        self.test_log['rule_params'] = params
+        self.test_log['rule_params'] = json.dumps(params)
+
+        self.assertEqual(
+            self.logger._build_rule_message(column,
+                                            rule,
+                                            error,
+                                            value,
+                                            rule_params=params), self.test_log)
+
+    def test_build_rule_message_string_params(self):
+        column = 'name'
+        rule = 'isName'
+        error = 'Not a name.\n'
+        value = 'not_a_name\n'
+        params = {"regex": "test.*\n"}
+
+        self.test_log['log_type'] = 'rule'
+        self.test_log['column'] = column
+        self.test_log['rule'] = rule
+        self.test_log['error'] = error
+        self.test_log['value'] = value
+        self.test_log['rule_params'] = json.dumps(params)
 
         self.assertEqual(
             self.logger._build_rule_message(column,
