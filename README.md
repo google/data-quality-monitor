@@ -5,11 +5,19 @@
 Data is the most important part of a modern business strategy. However, it's hard to
 maintain the robust foundation necessary for supporting data-driven decisions.
 
-Data Quality Monitor aims to empower clients with an easy way to monitor their data.
+Data Quality Monitor (DQM) aims to empower clients with an easy way to monitor their data.
 It can act on any data sitting in Bigquery, including exports from various Google Ads
 & Marketing Platform connectors. The checks/rules are configured with a simple Python
 file and scheduled as required. The output are logs that can be visualised and
 monitored for subsequent action. We also provide templates for common usecases.
+
+## Resources and Updates
+
+Join the [Google group](https://groups.google.com/g/data-quality-monitor-external-users) to:
+
+* View the [slide deck](https://docs.google.com/presentation/d/1OKrkZjrdi8U90dT6TbR0G0rYhihn9UVzoI88DTUiJMg/edit?usp=sharing) with use cases, the solution architecture and how to use it.
+* Receive e-mail updates on new features/updates.
+* Connect with DQM's creators and other users.
 
 ## Deployment
 
