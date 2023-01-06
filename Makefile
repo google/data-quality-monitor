@@ -25,11 +25,13 @@ Targets:
 	verify				run pre-commit checks
 	server				run local debug server
 	call				make requests to local debug server
-					Usage: ENDPOINT=route JSON=test.json make call
+					Usage: make call ENDPOINT=route JSON=test.json
+	data				generate test data into data/ folder
+					Usage: make data CONFIG=floodlight_report OUTFILE=test.csv NROWS=1000
 endef
 export PROJECT_HELP_MSG
 
-.PHONY: help install uninstall clean lint format test verify server call
+.PHONY: help install uninstall clean lint format test verify server call data
 .IGNORE: clean lint format
 
 help:
@@ -83,3 +85,6 @@ call:
 	curl -i $(DEBUG_HOST):$(DEBUG_PORT)/$(ENDPOINT) \
 		-H "Content-Type: application/json" \
 		-d @$(JSON)
+
+data:
+	python3 -m data.factory CONFIG=$(CONFIG) OUTFILE=$(OUTFILE) NROWS=$(NROWS)

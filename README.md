@@ -166,12 +166,21 @@ make server
 functions_framework --debug --target app
 ###############################
 
-# Make requests to local debug server
-ENDPOINT=/route make call
+# POST JSON to local debug server
+make call ENDPOINT=route JSON=test.json
 ###############################
 curl localhost:8080/<endpoint-route> \
   -H "Content-Type: application/json" \
   -d @<json_file>
+###############################
+
+# Generate test data into data/ folder
+make data CONFIG=floodlight_report OUTFILE=test.csv NROWS=1000
+###############################
+python3 -m data.factory \
+  CONFIG=<config> \
+  OUTFILE=<filename> \
+  NROWS=<number_of_rows>
 ###############################
 
 # Run pre-commit checks
