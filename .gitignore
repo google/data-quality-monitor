@@ -8,6 +8,9 @@ __pycache__/
 !example.env
 venv/
 
+# Data
+*.csv
+
 # Visual Studio Code
 .vscode
 
