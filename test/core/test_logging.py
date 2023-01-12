@@ -38,7 +38,7 @@ class PrintLoggerTest(unittest.TestCase):
         table_metadata = TableMetadata(project_id=project_id,
                                        dataset_id=dataset_id,
                                        table_name=table_name)
-        table_id = f"{project_id}.{dataset_id}.{table_name}"
+        full_table_id = f"{project_id}.{dataset_id}.{table_name}"
 
         self.test_log: dict[str, Any] = {
             "dqm_version_id": dqm_version_id,
@@ -47,7 +47,7 @@ class PrintLoggerTest(unittest.TestCase):
             "project_id": project_id,
             "dataset_id": dataset_id,
             "table_name": table_name,
-            "full_table_id": table_id
+            "full_table_id": full_table_id
         }
 
         self.logger = PrintLogger()

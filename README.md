@@ -183,12 +183,23 @@ curl localhost:8080/<endpoint-route> \
 ###############################
 
 # Generate test data into data/ folder
-make data CONFIG=floodlight_report OUTFILE=test.csv NROWS=1000
+make data CONFIG=config_name OUTFILE=test.csv NROWS=1000
 ###############################
-python3 -m data.factory \
+python3 -m data.generate \
   CONFIG=<config> \
   OUTFILE=<filename> \
   NROWS=<number_of_rows>
+###############################
+
+# Upload test data from data/ folder to BigQuery table
+make table CONFIG=config_name INFILE=test.csv TABLE=project.dataset.table ACTION=APPEND/REPLACE SAEMAIL=service@account.com
+###############################
+python3 -m data.upload \
+  CONFIG=<config> \
+  INFILE=<filename> \
+  TABLE=<bigquery_full_table_id> \
+  ACTION=<APPEND_or_REPLACE> \
+  SAEMAIL=<service_account_email>
 ###############################
 
 # Run pre-commit checks

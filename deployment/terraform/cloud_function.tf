@@ -3,9 +3,14 @@ data "archive_file" "zip_code_repo" {
   source_dir  = "../../"
   output_path = "../../dist/function-source.zip"
     excludes = [
+      "data",
+      "debug",
       "dist",
       "deployment",
       "test",
+      "venv",
+      ".env",
+      "example.env",
       ".flake8",
       ".gitignore",
       ".pre-commit-config.yaml",
@@ -13,12 +18,12 @@ data "archive_file" "zip_code_repo" {
       "example.env",
       "LICENSE",
       "Makefile",
-      "mypy.ini",
       "pyproject.toml",
       "requirements-dev.txt",
       "README.md",
     ]
 }
+
 resource "random_id" "bucket_prefix" {
   byte_length = 8
 }

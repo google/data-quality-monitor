@@ -1,5 +1,5 @@
 """
-Copyright 2022 Google LLC
+Copyright 2023 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,17 +20,18 @@ from abc import abstractmethod
 from datetime import datetime
 from enum import Enum
 import json
-from typing import Any, cast, List, Sequence
+from typing import Any, cast, Dict, List
 
 from typing_extensions import TypedDict
 
 from core.auth import AuthConfig
 from core.auth import get_credentials
 from core.bigquery import BigQueryLegacyClient
-from core.bigquery import build_table_id
 from core.bigquery import get_bq_legacy_client
 from core.bigquery import get_formatted_timestamp
 from core.bigquery import TableMetadata
+from core.bigquery import upload_rows
+from core.helpers import Buffer
 
 
 class LogMessage(TypedDict, total=False):
@@ -71,14 +72,16 @@ class Logger(ABC):
     """
 
     _base_log: LogMessage = {}
-    _batch_size: int
 
     DEFAULT_BATCH_SIZE: int
 
-    _messages: List[LogMessage] = []
+    _messages: Buffer[LogMessage]
 
     def __init__(self, batch_size: int | None = None) -> None:
-        self._batch_size = batch_size or self.DEFAULT_BATCH_SIZE
+        batch_size = batch_size or self.DEFAULT_BATCH_SIZE
+        buffer: List[LogMessage] = []
+        self._messages = Buffer[LogMessage](buffer, batch_size,
+                                            self.send_log_messages)
 
     def set_base_log(self, dqm_version_id: str, workflow_execution_id: str,
                      table_metadata: TableMetadata,
@@ -99,44 +102,39 @@ class Logger(ABC):
         self._base_log = LogMessage(
             dqm_version_id=dqm_version_id,
             workflow_execution_id=workflow_execution_id,
-            project_id=table_metadata['project_id'],
-            dataset_id=table_metadata['dataset_id'],
-            table_name=table_metadata['table_name'],
-            full_table_id=build_table_id(table_metadata),
+            project_id=table_metadata.project_id,
+            dataset_id=table_metadata.dataset_id,
+            table_name=table_metadata.table_name,
+            full_table_id=table_metadata.full_table_id,
             run_timestamp_utc=get_formatted_timestamp(run_dt_utc))
 
-    def queue_log_message(self, message: LogMessage) -> None:
+    def queue_log_message(self, message: LogMessage) -> bool | Any:
         """
-        Add a log message to the log queue.
+        Add a log message to the log queue and attempt a flush.
 
         Args:
             * message: LogMessage dictionary
 
         Returns:
-            * None
+            * True, if flushed with no errors
+            * False, if not flushed
+            * Error value from logger, if flushed with errors
         """
-        self._messages.append(message)
+        return self._messages.push(message)
 
-    def flush(self, force: bool = False) -> bool:
+    def flush(self, force: bool = False) -> bool | Any:
         """
-        Checks the current log message queue size and sends them all,
-        if the set limit has been reached.
+        Flushes the underlying log message queue.
 
         Args:
-            * force: Flush if the queue has items, but is below the size limit
+            * force: If True, force queue to flush
 
         Returns:
-            * Boolean: Whether a flush occurred or not
+            * True, if flushed with no errors
+            * False, if not flushed
+            * Error value from logger, if flushed with errors
         """
-        has_exceeded_batch_size = len(self._messages) >= self._batch_size
-        has_items_in_queue = len(self._messages) > 0
-
-        if has_exceeded_batch_size or (force and has_items_in_queue):
-            self.send_log_messages(self._messages)
-            self._messages = []
-            return True
-        else:
-            return False
+        return self._messages.flush(force=force)
 
     @abstractmethod
     def send_log_messages(self, messages: List[LogMessage]) -> None:
@@ -318,7 +316,7 @@ class BigQueryLogger(Logger):
     DEFAULT_BATCH_SIZE = 1000
 
     _bq_client: BigQueryLegacyClient
-    _table_id: str
+    _table_metadata: TableMetadata
 
     _fallback_logger: Logger
 
@@ -326,10 +324,10 @@ class BigQueryLogger(Logger):
                  table_metadata: TableMetadata,
                  auth_config: AuthConfig | None = None,
                  batch_size: int | None = None) -> None:
-        self._table_id = build_table_id(table_metadata)
+        self._table_metadata = table_metadata
 
         credentials = get_credentials(auth_config)
-        self._bq_client = get_bq_legacy_client(table_metadata['project_id'],
+        self._bq_client = get_bq_legacy_client(table_metadata.project_id,
                                                credentials)
 
         self._fallback_logger = PrintLogger()
@@ -347,24 +345,17 @@ class BigQueryLogger(Logger):
             * None
 
         Raises:
-            * RuntimeError: if BQ insert fails
+            * RuntimeError: if BigQuery insert fails
         """
-        result = self._bq_client.insert_rows_json(
-            self._table_id, cast(Sequence[dict], messages))
-        # result is empty if no errors occurred
-        for row in result:
-            if 'errors' in row and len(row['errors']) > 0:
-                for error in row['errors']:
-                    self._fallback_logger.send_log_message({
-                        "log_type": LogType.SYSTEM.value,
-                        "error": error['message']
-                    })
-                # Note:
-                # Failure here indicates a BQ log table schema issue
-                # We assume all rows will fail with the same error,
-                # so we only log one row to prevent polluting cloud logging
-                # and immediately raise to stop processing data further
-                raise RuntimeError('BigQuery logging failed: Check Cloud Logs.')
+        errors = upload_rows(self._bq_client, self._table_metadata,
+                             cast(List[Dict], messages))
+        if errors:
+            for error in errors:
+                self._fallback_logger.send_log_message({
+                    "log_type": LogType.SYSTEM.value,
+                    "error": error
+                })
+            raise RuntimeError('BigQuery logging failed: Check Cloud Logs.')
 
     def send_log_message(self, message: LogMessage) -> None:
         """
@@ -377,6 +368,6 @@ class BigQueryLogger(Logger):
             * None
 
         Raises:
-            * RuntimeError: if BQ insert fails
+            * RuntimeError: if BigQuery insert fails
         """
         self.send_log_messages([message])

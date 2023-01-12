@@ -1,6 +1,7 @@
 SHELL := /bin/bash
 
 VENV_DIRNAME = venv
+DATA_DIRNAME = data
 
 export VIRTUAL_ENV := $(abspath ${VENV_DIRNAME})
 export PATH := ${VIRTUAL_ENV}/bin:${PATH}
@@ -27,11 +28,13 @@ Targets:
 	call				make requests to local debug server
 					Usage: make call ENDPOINT=route JSON=test.json
 	data				generate test data into data/ folder
-					Usage: make data CONFIG=floodlight_report OUTFILE=test.csv NROWS=1000
+					Usage: make data CONFIG=config_name OUTFILE=test.csv NROWS=1000
+	table				upload test data from data/ folder to BigQuery table
+					Usage: make table CONFIG=config_name INFILE=test.csv TABLE=project.dataset.table ACTION=APPEND/REPLACE SAEMAIL=service@account.com
 endef
 export PROJECT_HELP_MSG
 
-.PHONY: help install uninstall clean lint format test verify server call data
+.PHONY: help install uninstall clean lint format test verify server call data table
 .IGNORE: clean lint format
 
 help:
@@ -82,9 +85,21 @@ server:
 		--target app
 
 call:
+	/usr/bin/time -f "\nRequest took %e seconds." \
 	curl -i $(DEBUG_HOST):$(DEBUG_PORT)/$(ENDPOINT) \
 		-H "Content-Type: application/json" \
 		-d @$(JSON)
 
 data:
-	python3 -m data.factory CONFIG=$(CONFIG) OUTFILE=$(OUTFILE) NROWS=$(NROWS)
+	CONFIG=$(CONFIG) \
+	OUTFILE="$(DATA_DIRNAME)/$(OUTFILE)" \
+	NROWS=$(NROWS) \
+		python3 -m data.generate
+
+table:
+	CONFIG=$(CONFIG) \
+	INFILE="$(DATA_DIRNAME)/$(INFILE)" \
+	TABLE=$(TABLE) \
+	ACTION=$(ACTION) \
+	SAEMAIL=$(SAEMAIL) \
+		python3 -m data.upload

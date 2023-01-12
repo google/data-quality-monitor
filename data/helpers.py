@@ -1,23 +1,48 @@
+"""
+Copyright 2023 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
 from dataclasses import dataclass
-import re
 from typing import Any, Callable, Dict, List
 
 from faker import Faker
+from google.cloud.bigquery import SchemaField
 
-BQ_REGEX = re.compile(r'[^a-zA-Z0-9]')
+from core.bigquery import convert_to_bq_name
 
 
-def build_valid_bq_name(name: str) -> str:
+def get_csv_row_count(filename: str) -> int:
     """
-    Build a valid BigQuery name.
+    Quickly count number of rows in the given csv file.
 
     Args:
-        * name: original name
+        * filename: Path to CSV file
 
     Returns:
-        * transformed valid name
+        * number of rows, minus header
     """
-    return BQ_REGEX.sub('_', name).lower()
+    row_count = 0
+    with open(filename, 'r') as f:
+
+        for _ in f:
+            row_count += 1
+
+        # account for header in non-empty file
+        if row_count != 0:
+            row_count -= 1
+
+    return row_count
 
 
 def words_string(fake: Faker, n: int) -> str:
@@ -37,7 +62,8 @@ def words_string(fake: Faker, n: int) -> str:
 @dataclass
 class Column:
     """
-    Representation of a column of CSV or BigQuery data
+    Representation of a column of Faker data with metadata for CSV
+    and BigQuery compatibility.
 
     Args:
         * name: original name
@@ -46,7 +72,7 @@ class Column:
         * value: Function uses a Faker to generate a new value
 
     Attributes:
-        * bqname: transformed name valid on BQ
+        * bqname: transformed BigQuery-compatible name
     """
     name: str
     bq_type: str
@@ -55,8 +81,35 @@ class Column:
     bq_name: str = ''
 
     def __post_init__(self) -> None:
-        self.bq_name = build_valid_bq_name(self.name)
+        self.bq_name = convert_to_bq_name(self.name)
 
 
 Row = Dict[str, Any]
 Config = List[Column]
+
+
+def generate_row(fake: Faker, config: Config) -> Row:
+    """
+    Generates a Row of Faker data, conforming to the config.
+
+    Args:
+        * fake: Faker instance
+        * config: List of Columns
+
+    Returns:
+        * Row of Faker data
+    """
+    row: Row = {}
+    for column in config:
+        row[column.bq_name] = column.value(fake)
+    return row
+
+
+def generate_bigquery_schema(config: Config) -> List[SchemaField]:
+    schema: List[SchemaField] = []
+    for column in config:
+        bq_column = SchemaField(name=column.bq_name,
+                                field_type=column.bq_type,
+                                mode='NULLABLE')
+        schema.append(bq_column)
+    return schema
