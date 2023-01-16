@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from flask import Flask
+from flask_pydantic import validate
 from functions_wrapper import entrypoint
 from werkzeug.exceptions import HTTPException
 
@@ -20,7 +22,11 @@ from core.http import handle_http_error
 from core.http import handle_malformed_config
 from core.http import handle_server_error
 from core.http import MalformedConfigError
-from dqm import dqm
+from routes.process_column import process_column
+
+dqm = Flask(__name__)
+
+dqm.route('/process_column', methods=['POST'])(validate()(process_column))
 
 dqm.register_error_handler(MalformedConfigError, handle_malformed_config)
 dqm.register_error_handler(HTTPException, handle_http_error)

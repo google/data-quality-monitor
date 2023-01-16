@@ -4,9 +4,13 @@ __pycache__/
 *$py.class
 
 # Environments
-.env
-!example.env
 venv/
+
+# Config
+*.env
+!example.env
+*.tfvars
+!example.tfvars
 
 # Data
 *.csv

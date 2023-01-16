@@ -1,11 +1,19 @@
+[tool.flake8]
+exclude = [
+  ".git/",
+  "venv/",
+]
+max-line-length = 80
+max-complexity = 12
+
 [tool.isort]
 profile = "google"
 
 [tool.mypy]
 python_version = "3.10"
 exclude = [
-    '.git/',       # git
-    'venv/',       # virtualenv
+    '.git/',
+    'venv/',
 ]
 check_untyped_defs = true
 # Google libraries lack type hints

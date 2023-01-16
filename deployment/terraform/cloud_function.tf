@@ -11,7 +11,6 @@ data "archive_file" "zip_code_repo" {
       "venv",
       ".env",
       "example.env",
-      ".flake8",
       ".gitignore",
       ".pre-commit-config.yaml",
       "CONTRIBUTING.md",
