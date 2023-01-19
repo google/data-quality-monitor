@@ -67,7 +67,7 @@ def build_table_metadata(full_table_id: str) -> TableMetadata:
     i.e. project_id.dataset_id.table_name
 
     Args:
-        * full_table_id - BigQuery full table ID
+        * full_table_id: BigQuery full table ID
 
     Returns:
         * TableMetadata object

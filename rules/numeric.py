@@ -1,5 +1,5 @@
 """
-Copyright 2022 Google LLC
+Copyright 2023 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,7 +33,10 @@ NegativeInfinity = '-inf'
 
 def parse_int(value: Any) -> Numeric:
     """
-    Attempts to parse a valid integer value from Any value.
+    Attempts to parse a valid integer value from the provided value.
+
+    Args:
+        * value: of Any type
 
     Returns:
         * int value: if valid
@@ -47,7 +50,10 @@ def parse_int(value: Any) -> Numeric:
 
 def parse_float(value: Any) -> Numeric:
     """
-    Attempts to parse a valid floating point value from Any value.
+    Attempts to parse a valid floating point value from the provided value.
+
+    Args:
+        * value: of Any type
 
     Returns:
         * float value: if valid
@@ -63,7 +69,11 @@ def is_within_strict_int_range(lower_bound: int,
                                upper_bound: int) -> RuleChecker[Numeric]:
     """
     Checks if the provided numeric value IS strictly bounded by integers
-    i.e. (lower_bound, upper_bound), with both bounds exclusive.
+    i.e. (lower_bound, upper_bound) with both bounds exclusive.
+
+    Args:
+        * lower_bound: lowest integer value (exclusive)
+        * upper_bound: highest integer value (exclusive)
 
     Returns:
         * None: if lower_bound < value < upper_bound
@@ -105,7 +115,10 @@ def is_not_approx_zero(
         tolerance: float = IEEE_TOLERANCE) -> RuleChecker[Numeric]:
     """
     Checks if the provided numeric value IS NOT within a
-    tolerance of zero (0) i.e [0 - tolerance, 0 + tolerance].
+    tolerance of zero (0), i.e [0 - tolerance, 0 + tolerance].
+
+    Args:
+        * tolerance (optional): float value, for approximating to zero
 
     Defaults:
         * tolerance: 1e-8 (8 decimal digits), as per

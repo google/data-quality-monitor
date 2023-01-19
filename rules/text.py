@@ -1,5 +1,5 @@
 """
-Copyright 2022 Google LLC
+Copyright 2023 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@ from .common import RuleOutput
 def parse_str(value: Any) -> str:
     """
     Convert the provided value into a string value.
+
+    Args:
+        * value: of Any type
 
     Returns:
         * string value
@@ -68,7 +71,7 @@ def contains_at_sign() -> RuleChecker[str]:
 def search_regex(regex: str) -> RuleChecker[str]:
     """
     Checks if the string contains some part of a given regular
-    expression, i.e string contains the word "Approved".
+    expression, i.e. string contains the word "Approved".
     """
     pattern = re.compile(regex)
 

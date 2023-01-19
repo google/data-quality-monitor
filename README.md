@@ -1,60 +1,73 @@
 # Data Quality Monitor
 
+**Continuously validate your data with easy, customizable rules**
+
 ## Context
 
 Data is the most important part of a modern business strategy. However, it's hard to
 maintain the robust foundation necessary for supporting data-driven decisions.
 
 Data Quality Monitor (DQM) aims to empower clients with an easy way to monitor their data.
-It can act on any data sitting in Bigquery, including exports from various Google Ads
-& Marketing Platform connectors. The checks/rules are configured with a simple Python
-file and scheduled as required. The output are logs that can be visualized and
-monitored for subsequent action. We also provide templates for common use cases.
+It runs on Google Cloud Platform (GCP) and can act on any data sitting in BigQuery, including
+exports from various Google Ads & Marketing Platform connectors. The checks/rules are
+configured with a simple JSON file and managed with scheduled Cloud Workflows. The output are
+logs that can be visualized and monitored for subsequent action. We also provide templates
+for common use cases.
+
+## Disclaimer
+
+DQM is fully owned and managed by you, within your GCP project.
+
+DQM is designed to be resource-efficient and low-cost. There are no additional fees - you only pay for the underlying usage of GCP resources.
+
+We provide DQM as an open-source solution, so you can contribute to or expand on its features.
 
 ## Resources and Updates
 
 Join the [Google group](https://groups.google.com/g/data-quality-monitor-external-users) to:
 
-* View the [slide deck](https://docs.google.com/presentation/d/1OKrkZjrdi8U90dT6TbR0G0rYhihn9UVzoI88DTUiJMg/edit?usp=sharing) with use cases, the solution architecture and how to use it.
-* Receive e-mail updates on new features/updates.
-* Connect with DQM's creators and other users.
+* View the [slide deck](https://docs.google.com/presentation/d/1OKrkZjrdi8U90dT6TbR0G0rYhihn9UVzoI88DTUiJMg/edit?usp=sharing) with a high level pitch, the solution architecture, and example use cases.
+* Receive email updates on new features and updates.
+* Connect with DQM's developers and other users.
 
 ## Deployment
 
-### Requirements
+### Pre-requisites
 
 In order to deploy this solution you need:
 
-* GCP project with billing enabled
+* Google Cloud Project with billing enabled
 * Account with Project Editor permissions
-
-#### Service Account
-
-Upon deployment, DQM will give it's service account the following permissions:
-
-* BigQuery Data Editor
-* BigQuery Read Session User
-* BigQuery Resource Viewer
-* BigQuery User
-* Storage Object Viewer
-* Logging Log Writer
 
 ### Steps
 
-Deployment of DQM is done through Terraform. Terraform is fully pre-installed in the Google Cloud Shell. Take the following steps to deploy DQM:
+DQM is deployed via Terraform, which comes fully pre-installed on Google Cloud Shell.
 
-1. Open the cloud project where you want to deploy the solution and open the Cloud Editor.
-2. In the terminal, run  ``` git clone https://github.com/gtech-professional-services/data-quality-monitor ```
-3. Run ``` cd data-quality-monitor/deployment/terraform ```
-4. Open ``` /deployment/terraform/example.tfvars ``` file and fill in your GCP project id. The other variables can be changed to your requirements.
-5. Run ```terraform init```
-6. Run ``` terraform plan -var-file="example.tfvars" ```
-7. Run ``` terraform apply -var-file="example.tfvars" ```
-8. Wait for terraform to deploy DQM.
+Take the following steps to setup DQM:
+
+1. Open the Google Cloud Project where you want to deploy DQM.
+1. Navigate to the [Cloud Shell Editor](https://ide.cloud.google.com/).
+1. Open the [Cloud Shell Terminal](https://shell.cloud.google.com/).
+1. Run `git clone https://github.com/google/data-quality-monitor`
+1. Run `cd data-quality-monitor/deployment/terraform`
+1. Run `cloudshell edit example.tfvars` and set the following values:
+    1. Required:
+        * `project_id`: GCP Project to deploy DQM onto
+    1. Optional:
+        * `cloud_storage_region`: Cloud Storage Bucket region to store configuration files
+        * `workflow_region`: Cloud Workflows region for DQM's workflow
+        * `cloud_function_region`: Cloud Function region for DQM's core
+        * `service_account_name`: Name for Service Account used by DQM
+1. Run `terraform init`
+1. Run `terraform plan -var-file="example.tfvars"`
+1. Run `terraform apply -var-file="example.tfvars"`
+1. Wait for terraform to deploy DQM.
 
 ### Configuration
 
-For DQM to know which table to scan for certain rules it uses configuration files in a Cloud Storage Bucket. config_template.json gives an example of what such files look like; they maintain the following structure:
+DQM reads configuration files from a Cloud Storage Bucket, which is created during deployment.
+
+An example is provided in `deployment/config_template.json`, and below:
 
 ```json
 {
@@ -97,23 +110,100 @@ For DQM to know which table to scan for certain rules it uses configuration file
 }
 ```
 
-### Cloud Storage Terraform State Saving
+#### Parser
 
-By default, Terraform saves state in the folder where it was deployed from, in this case that would be the Cloud Editor. As the Cloud Editor does not persist on a project level it is not possible for another user to manage the terraform deployed infrastructure. By taking additional steps the user can still save this state. In order to do this, complete a default deployment by following the steps above and followed the steps in ``` gcs_backend_state.tf ```.
+DQM always treats values from BigQuery as untyped, i.e. the required Type needs
+to be parsed first, before running Rules on the value.
+
+We offer some common Parsers, but you can also develop your own.
+
+Options:
+
+* `parse_str`: Convert into a string value.
+* `parse_int`: Parse a valid integer value.
+* `parse_float`: Parse a valid floating point value.
+
+#### Rule
+
+DQM only passes parsed values to Rules. The Rule checks whether the value
+satisfies the condition, and returns None if it succeeds. Otherwise,
+an Error string and metadata are logged to help you debug further. Some
+Rules can also be configured with arguments to customize their behavior.
+
+We offer some pre-built Rules, but you can also develop your own.
+
+Options per Parser, with possible arguments:
+
+* `parse_str`:
+  * `contains_at_sign`: Checks if the string contains "@", e.g. for quickly detecting email addresses.
+  * `is_email`: Checks if the string is possibly an email address.
+  * `is_phone_number`: Checks if the string is possibly a phone number.
+  * `fully_matches_regex`: Checks if the string fully matches a given regular expression.
+    * `regex`: [Python-compatible regex](https://docs.python.org/3/howto/regex.html)
+  * `search_regex`: Checks if the string contains some part of a given regular
+    expression.
+    * `regex`: [Python-compatible regex](https://docs.python.org/3/howto/regex.html)
+
+* `parse_int`:
+  * `is_not_negative`: Checks if the integer is not negative, i.e not positive (+) or zero (0).
+  * `is_not_approx_zero`: Checks if the integer is not within a tolerance of zero (0), i.e [0 - tolerance, 0 + tolerance].
+    * `tolerance`: float value, for approximating to zero (defaults to `1e-8`, i.e. 8 decimal digits)
+  * `is_within_strict_int_range`: Checks if the provided numeric value is strictly bounded by integers, i.e. (lower_bound, upper_bound) with both bounds exclusive.
+    * `lower_bound`: lowest integer value (exclusive)
+    * `upper_bound`: highest integer value (exclusive)
+
+* `parse_float`:
+  * `is_not_negative`: Checks if the integer is not negative, i.e not positive (+) or zero (0).
+  * `is_not_approx_zero`: Checks if the integer is not within a tolerance of zero (0), i.e [0 - tolerance, 0 + tolerance].
+    * `tolerance`: float value, for approximating to zero (defaults to `1e-8`, i.e. 8 decimal digits)
+  * `is_within_strict_int_range`: Checks if the provided numeric value is strictly bounded by integers, i.e. (lower_bound, upper_bound) with both bounds exclusive.
+    * `lower_bound`: lowest integer value (exclusive)
+    * `upper_bound`: highest integer value (exclusive)
+
+### Terraform
+
+DQM is deployed using [Terraform](https://developer.hashicorp.com/terraform/intro). This
+provides full oversight of the resources and permissions it uses, and ensures infrastructure
+and changes are stored in the code repository.
+
+By default, Terraform saves its "state" in the folder where it was deployed from, i.e. in the
+default case, the Cloud Shell Editor. As the Cloud Shell Editor does not persist on a project
+level, it is not possible for another user to manage the terraform deployed infrastructure from
+anywhere else. However, alternatively you can store state on Google Cloud Storage.
+
+In order to do this, after completing an initial normal deployment:
+
+1. Note the bucket name of the resource created in `google_storage_bucket.backend`.
+1. Open `deployment/terraform/gcs_backend_state.tf`.
+1. Fill in the bucket name in `terraform.backend.gcs`.
+1. Uncomment the commented lines for `terraform.backend.gcs`.
+1. Reinitialize terraform by running `terraform init`.
+1. Accept connection to the new Google Cloud Storage backend.
+1. Other users can then fill in the same value and share the same state.
+
+### Service Account
+
+DQM will automatically create a service account with the following permissions:
+
+* BigQuery Data Editor: `roles/bigquery.dataEditor`
+* BigQuery Resource Viewer: `roles/bigquery.resourceViewer`
+* BigQuery User: `roles/bigquery.user`
+* Cloud Function Invoker: `roles/cloudfunctions.invoker`
+* Storage Object Viewer: `roles/storage.objectViewer`
+* Logging Log Writer: `roles/logging.logWriter`
 
 ## Development
 
 ### Requirements
 
-This solution requires [Python 3.9+](https://www.python.org/downloads/). We use
-[make](https://www.gnu.org/software/make/) to easily automate tooling for setup,
-linting, formatting, and testing.
+This solution requires [Python 3.10+](https://www.python.org/downloads/). We use
+[make](https://www.gnu.org/software/make/) to seamlessly automate the underlying tooling.
 
 #### Developer Account
 
-IAM Permissions:
+You will need an Account that has the following IAM permissions:
 
-* Service Account Token Creator
+* Service Account Token Creator: `roles/iam.serviceAccountTokenCreator`
 
 #### ENV file
 
@@ -183,7 +273,9 @@ curl localhost:8080/<endpoint-route> \
 ###############################
 
 # Generate test data into data/ folder
-make data CONFIG=config_name OUTFILE=test.csv NROWS=1000
+make data CONFIG=config_name \
+          OUTFILE=test.csv \
+          NROWS=1000
 ###############################
 python3 -m data.generate \
   CONFIG=<config> \
@@ -192,7 +284,11 @@ python3 -m data.generate \
 ###############################
 
 # Upload test data from data/ folder to BigQuery table
-make table CONFIG=config_name INFILE=test.csv TABLE=project.dataset.table ACTION=APPEND/REPLACE SAEMAIL=service@account.com
+make table CONFIG=config_name \
+           INFILE=test.csv \
+           TABLE=project.dataset.table \
+           ACTION=APPEND/REPLACE \
+           SAEMAIL=service@account.com
 ###############################
 python3 -m data.upload \
   CONFIG=<config> \
@@ -233,8 +329,8 @@ pre-commit uninstall \
 ###############################
 ```
 
-## Disclaimer
+## License
 
-This is not an officially supported Google product.
+**This is not an officially supported Google product.**
 
-Copyright 2022 Google LLC. This solution, including any related sample code or data, is made available on an "as is", "as available", and "with all faults" basis, solely for illustrative purposes, and without warranty or representation of any kind. This solution is experimental, unsupported and provided solely for your convenience. Your use of it is subject to your agreements with Google, as applicable, and may constitute a beta feature as defined under those agreements. To the extent that you make any data available to Google in connection with your use of the solution, you represent and warrant that you have all necessary and appropriate rights, consents and permissions to permit Google to use and process that data. By using any portion of this solution, you acknowledge, assume and accept all risks, known and unknown, associated with its usage, including with respect to your deployment of any portion of this solution in your systems, or usage in connection with your business, if at all.
+Copyright 2023 Google LLC. This solution, including any related sample code or data, is made available on an "as is", "as available", and "with all faults" basis, solely for illustrative purposes, and without warranty or representation of any kind. This solution is experimental, unsupported and provided solely for your convenience. Your use of it is subject to your agreements with Google, as applicable, and may constitute a beta feature as defined under those agreements. To the extent that you make any data available to Google in connection with your use of the solution, you represent and warrant that you have all necessary and appropriate rights, consents and permissions to permit Google to use and process that data. By using any portion of this solution, you acknowledge, assume and accept all risks, known and unknown, associated with its usage, including with respect to your deployment of any portion of this solution in your systems, or usage in connection with your business, if at all.

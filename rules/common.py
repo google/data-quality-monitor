@@ -1,5 +1,5 @@
 """
-Copyright 2022 Google LLC
+Copyright 2023 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ TypeParser = Callable[[Any], T]
 """
 Type Parsers
 
-The parser must be named "parse_type" where "type" is a valid Python type. It
+The parser must be named "parse_type" where "type" is a valid defined type. It
 will be passed the value as Any and should return a valid Type value. If
 there is a parsing issue, it should return the error as a String.
 
@@ -60,7 +60,7 @@ None is ignored, but returning a String is logged as a failure. It will be
 passed the value parsed as a Type.
 
 We wrap the actual checking function, so that configured parameters can be
-evaluated to generate a "finalised" function with better runtime performance.
+evaluated to generate a "finalized" function with better runtime performance.
 
 Example -
     def is_foobar(arg_one: type_one,
