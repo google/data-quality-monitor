@@ -16,27 +16,27 @@ limitations under the License.
 import re
 import unittest
 
-from rules.text import search_regex
+from rules.text import contains_regex
 
 
-class searchRegex(unittest.TestCase):
+class ContainsRegexTest(unittest.TestCase):
 
     def setUp(self) -> None:
         test_regex = r'test'
-        self.rule_checker = search_regex(test_regex)
+        self.rule_checker = contains_regex(test_regex)
         return super().setUp()
 
     def test_returns_callable(self):
         self.assertTrue(callable(self.rule_checker))
 
     def test_contains_regex(self):
-        self.assertIsNotNone(self.rule_checker('test'))
-        self.assertIsNotNone(self.rule_checker('test123'))
+        self.assertIsNone(self.rule_checker('test'))
+        self.assertIsNone(self.rule_checker('test123'))
 
     def test_not_contains_regex(self):
-        self.assertIsNone(self.rule_checker('tes'))
-        self.assertIsNone(self.rule_checker('tes1t123'))
-        self.assertIsNone(self.rule_checker('123'))
+        self.assertIsNotNone(self.rule_checker('tes'))
+        self.assertIsNotNone(self.rule_checker('tes1t123'))
+        self.assertIsNotNone(self.rule_checker('123'))
 
     def test_invalid_regex_behaviour(self):
         # pass invalid regex
@@ -44,5 +44,5 @@ class searchRegex(unittest.TestCase):
 
         # assert that error is raised
         with self.assertRaises(re.error):
-            rule_checker = search_regex(test_regex)
+            rule_checker = contains_regex(test_regex)
             rule_checker('123')

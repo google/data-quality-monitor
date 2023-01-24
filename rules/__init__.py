@@ -38,7 +38,7 @@ NumericRules: RulesMap[numeric.Numeric] = func_mapper([
 
 TextRules: RulesMap[str] = func_mapper([
     text.contains_at_sign, text.fully_matches_regex, text.is_email,
-    text.is_phone_number, text.search_regex
+    text.is_phone_number, text.contains_regex
 ])
 
 

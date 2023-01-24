@@ -19,7 +19,7 @@ import unittest
 from rules.text import contains_at_sign
 
 
-class ContainsAtSign(unittest.TestCase):
+class ContainsAtSignTest(unittest.TestCase):
 
     def setUp(self) -> None:
         self.rule_checker = contains_at_sign()
@@ -29,10 +29,10 @@ class ContainsAtSign(unittest.TestCase):
         self.assertTrue(callable(self.rule_checker))
 
     def test_string_with_character(self):
-        self.assertIsNotNone(self.rule_checker("@"))
-        self.assertIsNotNone(self.rule_checker("john@doe.nl"))
-        self.assertIsNotNone(self.rule_checker("john@@"))
+        self.assertIsNone(self.rule_checker("@"))
+        self.assertIsNone(self.rule_checker("john@doe.nl"))
+        self.assertIsNone(self.rule_checker("john@@"))
 
     def test_string_without_character(self):
-        self.assertIsNone(self.rule_checker("johndoe.com"))
-        self.assertIsNone(self.rule_checker(""))
+        self.assertIsNotNone(self.rule_checker("johndoe.com"))
+        self.assertIsNotNone(self.rule_checker(""))

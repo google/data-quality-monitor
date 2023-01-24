@@ -43,7 +43,7 @@ class GenerateSelectedRulesTest(unittest.TestCase):
     def test_mismatched_rule(self):
         rules: RulesMap = NumericRules
         with self.assertRaises(ValueError):
-            generate_selected_rules([RuleConfig(rule="search_regex")], rules)
+            generate_selected_rules([RuleConfig(rule="contains_regex")], rules)
 
     def test_numeric_rule(self):
         rules: RulesMap = NumericRules
@@ -79,11 +79,11 @@ class GenerateSelectedRulesTest(unittest.TestCase):
     def test_text_rule_with_args(self):
         rules: RulesMap = TextRules
         generated = generate_selected_rules(
-            [RuleConfig(rule="search_regex", args={"regex": "testpattern"})],
+            [RuleConfig(rule="contains_regex", args={"regex": "testpattern"})],
             rules)
         generated_rule = generated[0]
 
-        self.assertIn('search_regex', generated_rule.__qualname__)
+        self.assertIn('contains_regex', generated_rule.__qualname__)
 
-        self.assertIsNone(generated_rule("otherpattern"))
-        self.assertIsNotNone(generated_rule("testpattern"))
+        self.assertIsNotNone(generated_rule("otherpattern"))
+        self.assertIsNone(generated_rule("testpattern"))

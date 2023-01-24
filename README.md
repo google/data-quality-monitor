@@ -140,7 +140,7 @@ Options per Parser, with possible arguments:
   * `is_phone_number`: Checks if the string is possibly a phone number.
   * `fully_matches_regex`: Checks if the string fully matches a given regular expression.
     * `regex`: [Python-compatible regex](https://docs.python.org/3/howto/regex.html)
-  * `search_regex`: Checks if the string contains some part of a given regular
+  * `contains_regex`: Checks if the string contains some part of a given regular
     expression.
     * `regex`: [Python-compatible regex](https://docs.python.org/3/howto/regex.html)
 

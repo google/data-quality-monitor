@@ -44,10 +44,10 @@ def is_email() -> RuleChecker[str]:
     pattern = re.compile(regex)
 
     def _checker(string: str) -> RuleOutput:
-        if (pattern.search(string)):
-            return 'String contains a possible email address.'
-        else:
+        if pattern.search(string):
             return None
+        else:
+            return 'String does not resemble an email address.'
 
     return _checker
 
@@ -59,16 +59,15 @@ def contains_at_sign() -> RuleChecker[str]:
     """
 
     def _checker(string: str) -> RuleOutput:
-
         if '@' in string:
-            return 'String contains the @ character.'
-        else:
             return None
+        else:
+            return 'String does not contain the @ character.'
 
     return _checker
 
 
-def search_regex(regex: str) -> RuleChecker[str]:
+def contains_regex(regex: str) -> RuleChecker[str]:
     """
     Checks if the string contains some part of a given regular
     expression, i.e. string contains the word "Approved".
@@ -77,10 +76,10 @@ def search_regex(regex: str) -> RuleChecker[str]:
 
     def _checker(string: str) -> RuleOutput:
         #
-        if (pattern.search(string)):
-            return 'String contains a match for the given pattern.'
-        else:
+        if pattern.search(string):
             return None
+        else:
+            return 'String does not contain a match for the given pattern.'
 
     return _checker
 
@@ -93,10 +92,10 @@ def fully_matches_regex(regex: str) -> RuleChecker[str]:
     pattern = re.compile(regex)
 
     def _checker(string: str) -> RuleOutput:
-        if (pattern.fullmatch(string)):
-            return 'String is a full match for the given pattern.'
-        else:
+        if pattern.fullmatch(string):
             return None
+        else:
+            return 'String is not a full match for the given pattern.'
 
     return _checker
 
@@ -112,10 +111,10 @@ def is_phone_number() -> RuleChecker[str]:
         try:
             int_number = int(string)
             if 9 < len(string) < 14 and int_number > 999999:
-                return 'String contains a possible phone number.'
-            else:
                 return None
+            else:
+                raise ValueError
         except ValueError:
-            return None
+            return 'String does not resemble a phone number.'
 
     return _checker

@@ -126,7 +126,7 @@ random_phone_numbers = [
 # yapf: enable
 
 
-class IsPhoneNumber(unittest.TestCase):
+class IsPhoneNumberTest(unittest.TestCase):
 
     def setUp(self) -> None:
         self.rule_checker = is_phone_number()
@@ -138,10 +138,10 @@ class IsPhoneNumber(unittest.TestCase):
     def test_phone_numbers(self):
         # standard phone number
         for number in random_phone_numbers:
-            self.assertIsNotNone(self.rule_checker(number))
+            self.assertIsNone(self.rule_checker(number))
 
     def test_non_phone_numbers(self):
         # standard phone number
-        self.assertIsNone(self.rule_checker('test'))
-        self.assertIsNone(self.rule_checker('23598734928057034978'))
-        self.assertIsNone(self.rule_checker('00000000000'))
+        self.assertIsNotNone(self.rule_checker('test'))
+        self.assertIsNotNone(self.rule_checker('23598734928057034978'))
+        self.assertIsNotNone(self.rule_checker('00000000000'))

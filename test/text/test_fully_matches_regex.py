@@ -19,7 +19,7 @@ import unittest
 from rules.text import fully_matches_regex
 
 
-class fullyMatchesRegex(unittest.TestCase):
+class FullyMatchesRegexTest(unittest.TestCase):
 
     def setUp(self) -> None:
         test_regex = r'test'
@@ -30,12 +30,12 @@ class fullyMatchesRegex(unittest.TestCase):
         self.assertTrue(callable(self.rule_checker))
 
     def test_contains_regex(self):
-        self.assertIsNotNone(self.rule_checker('test'))
+        self.assertIsNone(self.rule_checker('test'))
 
     def test_non_matching_regex(self):
-        self.assertIsNone(self.rule_checker('tes'))
-        self.assertIsNone(self.rule_checker('tes1t123'))
-        self.assertIsNone(self.rule_checker('123'))
+        self.assertIsNotNone(self.rule_checker('tes'))
+        self.assertIsNotNone(self.rule_checker('tes1t123'))
+        self.assertIsNotNone(self.rule_checker('123'))
 
     def test_invalid_regex_behaviour(self):
         # pass invalid regex
