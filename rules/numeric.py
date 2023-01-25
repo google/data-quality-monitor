@@ -92,7 +92,7 @@ def is_within_strict_int_range(lower_bound: int,
 def is_not_negative() -> RuleChecker[Numeric]:
     """
     Checks if the provided numeric value IS NOT negative
-    i.e NOT positive (+) or zero (0).
+    i.e. NOT positive (+) or zero (0).
 
     Returns:
         * None: if value >= 0
@@ -115,7 +115,7 @@ def is_not_approx_zero(
         tolerance: float = IEEE_TOLERANCE) -> RuleChecker[Numeric]:
     """
     Checks if the provided numeric value IS NOT within a
-    tolerance of zero (0), i.e [0 - tolerance, 0 + tolerance].
+    tolerance of zero (0), i.e. [0 - tolerance, 0 + tolerance].
 
     Args:
         * tolerance (optional): float value, for approximating to zero
