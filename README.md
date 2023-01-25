@@ -30,7 +30,7 @@ Join the [Google group](https://groups.google.com/g/data-quality-monitor-externa
 * Receive email updates on new features and updates.
 * Connect with DQM's developers and other users.
 
-## Deployment
+## Installation
 
 ### Pre-requisites
 
@@ -38,14 +38,14 @@ In order to deploy this solution you need:
 
 * Google Cloud Project with billing enabled
 * Account with Project Editor permissions
-* A table with data to check
-* A log dataset created
+* A BigQuery table with data to check/monitor
+* A BigQuery dataset to store the output log table
 
 ### Steps
 
-DQM is deployed via Terraform, which comes fully pre-installed on Google Cloud Shell.
+DQM uses Terraform, which comes fully pre-installed on Google Cloud Shell.
 
-Take the following steps to setup DQM:
+#### Deployment
 
 1. Open the Google Cloud Project where you want to deploy DQM.
 1. Navigate to the [Cloud Shell Editor](https://ide.cloud.google.com/).
@@ -61,19 +61,56 @@ Take the following steps to setup DQM:
         * `cloud_function_region`: Cloud Function region for DQM's core
         * `service_account_name`: Name for Service Account used by DQM
 1. Run `terraform init`
-1. Allow the authentication prompt.
+1. Review the `gcloud` authentication prompt and click "Authorize".
 1. Run `terraform plan -var-file="example.tfvars"`
-1. Run `terraform apply -var-file="example.tfvars"` and review the prompt and confirm.
-1. Would any errors occur, resolve them and re-run the apply command.
-1. Wait for terraform to deploy DQM.
-1. (Optional) Navigate to Cloud Workflows in the GCP UI, select the dqm_trigger workflow and hit edit. In triggers you can set-up regular executions of DQM. If prompted enable the Cloud Scheduler API. Follow the steps, the worklow argument will remain empty. For service account select your specified DQM service account. Then select next and deploy the workflow.
+1. Run `terraform apply -var-file="example.tfvars"`
+1. Review the deployment plan and type `yes` to confirm.
+1. Wait while terraform deploys DQM.
+1. If any errors occur, resolve them and re-run the `terraform apply ...` command.
+1. Otherwise, you have now successfully deployed DQM!
 
-After you've succesfully set-up DQM you need to upload the config file explained in **Configuration**. Take the following steps to edit and upload this file:
+#### Setup
+
+DQM is built to be scalable across projects, with all configuration files stored in a single Cloud Storage bucket. You only require one deployed DQM instance, which will parallelize as necessary through Cloud Workflows.
+
+1. Navigate back to the [Cloud Shell Editor](https://ide.cloud.google.com/).
+1. Reopen the [Cloud Shell Terminal](https://shell.cloud.google.com/).
 1. Run `cloudshell edit ../config_template.json`
-1. Complete the variables as detailed in **Configuration** below. You can remove the service account key-value pair if there is no specific service account required to read the input table.
-1. Rename the the file to a relevant name and download the file. Download the file through the cloud editor by clicking "file" in the top left and select download.
-1. Navigate to Google Cloud Storage in GCP and open the dqm-config..... bucket. Upload the config file im this bucket.
-1. DQM is now ready to go, you can manually execute the workflow by navigating to cloud workflow or wait for the (optional) cloud scheduler to trigger the workflow.
+1. Fill in appropriate values as detailed in the [Configuration](#configuration) section below.
+1. Once done, open the "File" menu and click "Download" to save the file locally.
+1. Rename it appropriately, using unique names for every config file.
+1. Navigate to [Google Cloud Storage](https://cloud.google.com/storage).
+1. Open the bucket named `dqm-config-...` and upload the config file.
+1. DQM will now pickup this config file on its next run.
+
+#### Automation
+
+DQM can automatically run on your desired schedule with a Cloud Scheduler trigger.
+
+1. Navigate to [Cloud Workflows](https://console.cloud.google.com/workflows).
+1. Select the `dqm_trigger` workflow and click "Edit".
+1. Add a new "Cloud Scheduler" trigger.
+1. If prompted, review the Cloud Scheduler API prompt and click "Enable".
+1. Give the trigger a name, and choose the region that matches your workflow.
+1. Determine an appropriate [cron schedule](https://cloud.google.com/scheduler/docs/configuring/cron-job-schedules#cron_job_format) for the chosen timezone, using the help tooltips.
+1. Click "Continue" and leave the workflow argument empty - `{}`.
+1. Select "All calls" for the workflow call log level.
+1. Select the "DQM Service Account" (`tfvars` default: `dqm-account@<project-id>.iam.gserviceaccount.com`).
+1. Click "Next" and save the trigger.
+1. Click "Next" to proceed to the workflow definition page.
+1. Click "Deploy" to save and re-deploy the workflow with a trigger.
+1. DQM will now automatically run on a schedule.
+
+#### Execution (optional)
+
+If you want to bypass the schedule and run DQM manually:
+
+1. Navigate to [Cloud Workflows](https://console.cloud.google.com/workflows).
+1. Select the `dqm_trigger` workflow and click "Execute".
+1. Leave the input empty - `{}` and select "All calls" for the log level.
+1. Click "Execute".
+1. You can observe the runtime logs within the UI.
+1. Once completed, you can view the output logs in BigQuery.
 
 ### Configuration
 
@@ -122,7 +159,32 @@ An example is provided in `deployment/config_template.json`, and below:
 }
 ```
 
-#### Parser
+#### Settings
+
+* `service_account_email`: (optional)
+  * DQM uses the "DQM Service Account" (`tfvars` default: `dqm-account@<project-id>.iam.gserviceaccount.com`)
+  * Important: Remove this line, if you do not need to change this.
+  * You can enter a different value, if the DQM account can impersonate it.
+  * This enables the same instance of DQM to operate across project boundaries.
+
+* BigQuery tables:
+  * `source_table`: A BigQuery table with data to check/monitor
+  * `log_table`: A BigQuery table to store the output log table
+  * Fields:
+    * `project_id`: BigQuery project ID
+    * `dataset_id`: BigQuery dataset ID
+    * `table_name`: BigQuery table name
+
+* BigQuery table `columns`: (mapping)
+  * key: BigQuery table column name
+  * value:
+    * `parser`: [Parser name](#parsers)
+    * `rules`: (list)
+      * `rule`: [Rule name](#rules)
+      * `args`: (mapping, optional)
+        * `name`: `value` (see below, for options)
+
+#### Parsers
 
 DQM always treats values from BigQuery as untyped, i.e. the required Type needs
 to be parsed first, before running Rules on the value.
@@ -135,7 +197,7 @@ Options:
 * `parse_int`: Parse a valid integer value.
 * `parse_float`: Parse a valid floating point value.
 
-#### Rule
+#### Rules
 
 DQM only passes parsed values to Rules. The Rule checks whether the value
 satisfies the condition, and returns None if it succeeds. Otherwise,
@@ -193,7 +255,15 @@ In order to do this, after completing an initial normal deployment:
 1. Accept connection to the new Google Cloud Storage backend.
 1. Other users can then fill in the same value and share the same state.
 
-### Service Account
+#### API & Services
+
+DQM will automatically enable the following APIs & Services:
+
+* Cloud Functions: `cloudfunctions.googleapis.com`
+* Cloud Build: `cloudbuild.googleapis.com`
+* Cloud Workflows: `workflows.googleapis.com`
+
+#### Service Account
 
 DQM will automatically create a service account with the following permissions:
 
@@ -222,8 +292,8 @@ You will need an Account that has the following IAM permissions:
 Make a copy of `example.env` as `.env` and fill in the values:
 
 ```bash
-GCP_PROJECT_ID=data-quality-monitor-example
-SERVICE_ACCOUNT_EMAIL=dqm@project-id.iam.gserviceaccount.com
+GCP_PROJECT_ID=<project-id>
+SERVICE_ACCOUNT_EMAIL=dqm@<project-id>.iam.gserviceaccount.com
 ```
 
 ### Workflow
