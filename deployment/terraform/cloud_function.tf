@@ -65,4 +65,8 @@ resource "google_cloudfunctions_function" "function" {
   timeout               = 540
   entry_point           = "app"
   service_account_email = google_service_account.main_account.email
+    depends_on = [
+    google_project_service.cloudfunctions,
+    google_project_service.cloudbuild
+  ]
 }

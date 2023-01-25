@@ -38,6 +38,8 @@ In order to deploy this solution you need:
 
 * Google Cloud Project with billing enabled
 * Account with Project Editor permissions
+* A table with data to check
+* A log dataset created
 
 ### Steps
 
@@ -59,9 +61,19 @@ Take the following steps to setup DQM:
         * `cloud_function_region`: Cloud Function region for DQM's core
         * `service_account_name`: Name for Service Account used by DQM
 1. Run `terraform init`
+1. Allow the authentication prompt.
 1. Run `terraform plan -var-file="example.tfvars"`
-1. Run `terraform apply -var-file="example.tfvars"`
+1. Run `terraform apply -var-file="example.tfvars"` and review the prompt and confirm.
+1. Would any errors occur, resolve them and re-run the apply command.
 1. Wait for terraform to deploy DQM.
+1. (Optional) Navigate to Cloud Workflows in the GCP UI, select the dqm_trigger workflow and hit edit. In triggers you can set-up regular executions of DQM. If prompted enable the Cloud Scheduler API. Follow the steps, the worklow argument will remain empty. For service account select your specified DQM service account. Then select next and deploy the workflow.
+
+After you've succesfully set-up DQM you need to upload the config file explained in **Configuration**. Take the following steps to edit and upload this file:
+1. Run `cloudshell edit ../config_template.json`
+1. Complete the variables as detailed in **Configuration** below. You can remove the service account key-value pair if there is no specific service account required to read the input table.
+1. Rename the the file to a relevant name and download the file. Download the file through the cloud editor by clicking "file" in the top left and select download.
+1. Navigate to Google Cloud Storage in GCP and open the dqm-config..... bucket. Upload the config file im this bucket.
+1. DQM is now ready to go, you can manually execute the workflow by navigating to cloud workflow or wait for the (optional) cloud scheduler to trigger the workflow.
 
 ### Configuration
 

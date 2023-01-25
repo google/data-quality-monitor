@@ -8,6 +8,7 @@ resource "google_workflows_workflow" "main" {
     CLOUD-BUCKET-WITH-CONFIG-FILES = "${google_storage_bucket.config.name}"
   })
   depends_on = [
-    google_storage_bucket.config
+    google_storage_bucket.config,
+    google_project_service.workflows
   ]
 }
