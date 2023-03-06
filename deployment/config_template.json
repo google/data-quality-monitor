@@ -3,7 +3,8 @@
   "source_table": {
     "project_id": "YOUR-GCP-PROJECT-ID",
     "dataset_id": "BIGQUERY-DATASET-TO-MONITOR",
-    "table_name": "STRING-TO-FILTER-ON-IN-TABLE-NAME"
+    "table_name": "STRING-TO-FILTER-ON-IN-TABLE-NAME",
+    "n_tables_to_check": "NUMBER-OF-RECENT-TABLES"
   },
   "log_table": {
     "project_id": "GCP-PROJECT-TO-STORE-LOGS",

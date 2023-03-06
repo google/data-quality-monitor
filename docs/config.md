@@ -10,7 +10,8 @@ An example is provided in `deployment/config_template.json`, and below:
   "source_table": {
     "project_id": "YOUR-GCP-PROJECT-ID",
     "dataset_id": "BIGQUERY-DATASET",
-    "table_name": "STRING-TO-FILTER-ON-IN-TABLE-NAME"
+    "table_name": "STRING-TO-FILTER-ON-IN-TABLE-NAME",
+    "n_tables_to_check": "NUMBER-OF-RECENT-TABLES"
   },
   "log_table": {
     "project_id": "BIGQUERY-PROJECT-TO-STORE-LOGS",
@@ -62,11 +63,15 @@ An example is provided in `deployment/config_template.json`, and below:
     * An underscore `_` matches a single character or byte.
     * You can escape `\`, `_`, or `%` using two backslashes - `\\`.
     * Example: `floodlights\\_report\\_%` will match any table starting with `floodlights_report_`.
+    * DQM retrieves all tables matching the table name pattern. Specify the number of tables to check in `n_tables_to_check`, most recently created table first. e.g check only most recent table: `n_tables_to_check` = 1
+
   * DQM will loop through the matching tables.
+  * Important: Make sure that the DQM service account has `roles/bigquery.dataViewer` access on the dataset.
   * Fields:
     * `project_id`: BigQuery project ID
     * `dataset_id`: BigQuery dataset ID
     * `table_name`: BigQuery table name
+    * `n_tables_to_check`: Number of tables DQM will check
 
 * `log_table`: (optional)
   * A BigQuery table to store the output log table.
