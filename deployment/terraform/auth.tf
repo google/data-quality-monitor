@@ -57,3 +57,12 @@ resource "google_project_iam_binding" "logs_writer" {
     local.service_account_full,
   ]
 }
+
+resource "google_project_iam_binding" "workflows_invoker" {
+  project = var.project_id
+  role    = "roles/workflows.invoker"
+
+  members = [
+    local.service_account_full,
+  ]
+}

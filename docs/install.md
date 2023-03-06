@@ -117,3 +117,4 @@ Terraform will automatically create a service account with the following permiss
 * Cloud Functions Invoker (`roles/cloudfunctions.invoker`)
 * Storage Object Viewer (`roles/storage.objectViewer`)
 * Logging Log Writer (`roles/logging.logWriter`)
+* Workflows Invoker (`roles/workflows.invoker`)
