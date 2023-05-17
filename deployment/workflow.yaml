@@ -61,7 +61,7 @@
                           projectId: $${config_json_content.body.log_table.project_id}
                           body:
                               useLegacySql: false
-                              projectId: $${projectId}
+                              projectId: $${config_json_content.body.log_table.project_id}
                               query: $${"CREATE TABLE IF NOT EXISTS " + config_json_content.body.log_table.dataset_id + "." +config_json_content.body.log_table.table_name + " (dqm_version_id STRING,workflow_execution_id STRING,run_timestamp_utc STRING,project_id STRING,dataset_id STRING,table_name STRING,full_table_id STRING,log_type STRING,column STRING,error STRING,parser STRING,rule STRING,rule_params JSON,value STRING)"}
 
               - get_table_names:
@@ -70,7 +70,7 @@
                       projectId: $${config_json_content.body.source_table.project_id}
                       body:
                           useLegacySql: false
-                          projectId: $${projectId}
+                          projectId: $${config_json_content.body.source_table.project_id}
                           query: $${"SELECT table_name FROM " + config_json_content.body.source_table.dataset_id + ".INFORMATION_SCHEMA.TABLES WHERE table_name LIKE '" + config_json_content.body.source_table.table_name + "' ORDER BY creation_time DESC LIMIT " + config_json_content.body.source_table.n_tables_to_check }
                   result: queryResult
 
