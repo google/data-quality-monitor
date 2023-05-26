@@ -84,6 +84,31 @@
                                   assign:
                                       - dataset_id: $${config_json_content.body.source_table.dataset_id}
                                       - table_name: $${row.f[0].v}
+                              - get_table_info:
+                                  call: googleapis.bigquery.v2.tables.get
+                                  args:
+                                    projectId: $${project_id}
+                                    datasetId: $${dataset_id}
+                                    tableId: $${table_name}
+                                  result: table_info
+                              - check_if_view:
+                                  switch:
+                                    - condition: $${table_info.type == "VIEW"}
+                                      next: create_temp_table
+                                    - condition: $${table_info.type != "VIEW"}
+                                      next: column_loop
+                              - create_temp_table:
+                                  call: googleapis.bigquery.v2.jobs.query
+                                  args:
+                                    projectId: $${project_id}
+                                    body:
+                                      useLegacySql: false
+                                      projectId: $${project_id}
+                                      query: $${"CREATE OR REPLACE TABLE " + project_id + "." + dataset_id + "." + table_name  + "_table OPTIONS(expiration_timestamp = TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL 2 DAY)) AS SELECT * FROM " + project_id + "." + dataset_id + "." + table_name}
+                                  result: job_info
+                              - Update table name:
+                                    assign:
+                                      - table_name: $${table_name + "_table"}
                               - column_loop:
                                   parallel:
                                       for:
@@ -101,7 +126,7 @@
                                                                         source_table:
                                                                             project_id: $${config_json_content.body.source_table.project_id}
                                                                             dataset_id: $${config_json_content.body.source_table.dataset_id}
-                                                                            table_name: $${config_json_content.body.source_table.table_name}
+                                                                            table_name: $${table_name}
                                                                         log_table:
                                                                             project_id: $${config_json_content.body.log_table.project_id}
                                                                             dataset_id: $${config_json_content.body.log_table.dataset_id}
