@@ -9,11 +9,12 @@
 # to GCS backend.
 
 resource "google_storage_bucket" "backend" {
-  name          = "${random_id.bucket_prefix.hex}-bucket-tfstate"
-  force_destroy = false
-  location      = var.cloud_storage_region
-  storage_class = "STANDARD"
+  name                        = "${random_id.bucket_prefix.hex}-bucket-tfstate"
+  force_destroy               = false
+  location                    = var.cloud_storage_region
+  storage_class               = "STANDARD"
   uniform_bucket_level_access = true
+  project                     = var.project_id
   versioning {
     enabled = true
   }

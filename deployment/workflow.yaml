@@ -61,6 +61,7 @@
                           projectId: $${config_json_content.body.log_table.project_id}
                           body:
                               useLegacySql: false
+                              location: ${BQ-LOCATION}
                               projectId: $${config_json_content.body.log_table.project_id}
                               query: $${"CREATE TABLE IF NOT EXISTS " + config_json_content.body.log_table.dataset_id + "." +config_json_content.body.log_table.table_name + " (dqm_version_id STRING,workflow_execution_id STRING,run_timestamp_utc STRING,project_id STRING,dataset_id STRING,table_name STRING,full_table_id STRING,log_type STRING,column STRING,error STRING,parser STRING,rule STRING,rule_params JSON,value STRING)"}
 
@@ -104,11 +105,22 @@
                                     body:
                                       useLegacySql: false
                                       projectId: $${project_id}
-                                      query: $${"CREATE OR REPLACE TABLE " + project_id + "." + dataset_id + "." + table_name  + "_table OPTIONS(expiration_timestamp = TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL 2 DAY)) AS SELECT * FROM " + project_id + "." + dataset_id + "." + table_name}
-                                  result: job_info
-                              - Update table name:
+                                      maxResults: 1
+                                      query: $${"SELECT * FROM " + project_id + "." + dataset_id + "." + table_name}
+                                  result: queryResponse
+                              - getJob:
+                                  call: googleapis.bigquery.v2.jobs.get
+                                  args:
+                                    projectId: $${project_id}
+                                    jobId: $${queryResponse.jobReference.jobId}
+                                  result: job
+                              - getDestinationTable:
+                                  assign:
+                                  - destinationTable: $${job.configuration.query.destinationTable}
+                              - update table name:
                                     assign:
-                                      - table_name: $${table_name + "_table"}
+                                      - dataset_id: $${destinationTable.datasetId}
+                                      - table_name: $${destinationTable.tableId}
                               - column_loop:
                                   parallel:
                                       for:
@@ -123,9 +135,13 @@
                                                                     - request_body:
                                                                         workflow_execution_id: $${workflow_execution_id}
                                                                         config_file: $${file.name}
-                                                                        source_table:
-                                                                            project_id: $${config_json_content.body.source_table.project_id}
+                                                                        display_source_table:
+                                                                            project_id: $${project_id}
                                                                             dataset_id: $${config_json_content.body.source_table.dataset_id}
+                                                                            table_name: $${row.f[0].v}
+                                                                        source_table:
+                                                                            project_id: $${project_id}
+                                                                            dataset_id: $${dataset_id}
                                                                             table_name: $${table_name}
                                                                         log_table:
                                                                             project_id: $${config_json_content.body.log_table.project_id}

@@ -3,9 +3,11 @@ resource "google_workflows_workflow" "main" {
   region          = var.workflow_region
   description     = "Workflow that retrieves config from cloud storage and triggers cloud function"
   service_account = google_service_account.main_account.id
+  project         = var.project_id
   source_contents = templatefile("../workflow.yaml", {
     CLOUD-FUNCTION-URL             = "${google_cloudfunctions_function.function.https_trigger_url}",
-    CLOUD-BUCKET-WITH-CONFIG-FILES = "${google_storage_bucket.config.name}"
+    CLOUD-BUCKET-WITH-CONFIG-FILES = "${google_storage_bucket.config.name}",
+    BQ-LOCATION                    = "${var.bigquery_location}"
   })
   depends_on = [
     google_storage_bucket.config,

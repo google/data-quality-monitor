@@ -22,3 +22,8 @@ variable "cloud_function_region" {
   type        = string
   description = "region where to deploy the cloud function"
 }
+
+variable "bigquery_location" {
+  type        = string
+  description = "region where to call BigQuery"
+}

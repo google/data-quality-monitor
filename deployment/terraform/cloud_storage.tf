@@ -3,5 +3,6 @@ resource "google_storage_bucket" "config" {
   location                    = var.cloud_storage_region
   uniform_bucket_level_access = true
   force_destroy               = true
+  project                     = var.project_id
 
 }

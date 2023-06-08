@@ -38,6 +38,7 @@ class ProcessColumnRequest(BaseModel):
     workflow_execution_id: str = 'development'
     auth_config: Optional[AuthConfig]
     source_table: TableMetadata
+    display_source_table: TableMetadata
     log_table: Optional[TableMetadata]
     column_config: ColumnConfig
 
@@ -64,7 +65,7 @@ def process_column(body: ProcessColumnRequest) -> ResponseReturnValue:
         logger = BigQueryLogger(body.log_table, body.auth_config)
 
     logger.set_base_log(__version__, body.workflow_execution_id,
-                        body.source_table, datetime.utcnow())
+                        body.display_source_table, datetime.utcnow())
 
     bq_read_client = get_bq_read_client(credentials)
 
