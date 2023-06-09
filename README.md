@@ -41,7 +41,7 @@ You can read more in the [configuration docs](docs/config.md).
 
 ### [Usage](docs/usage.md)
 
-DQM can be automated with [Cloud Scheduler](https://cloud.google.com/scheduler).
+DQM can be automated with [Cloud Scheduler](https://cloud.google.com/scheduler). Simply set `pause_scheduler` to `false` in the .tfvars file during deployment.
 
 It outputs extensive logging, which can be leveraged for notifications or dashboards.
 

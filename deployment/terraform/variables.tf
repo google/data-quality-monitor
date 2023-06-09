@@ -27,3 +27,13 @@ variable "bigquery_location" {
   type        = string
   description = "region where to call BigQuery"
 }
+
+variable "trigger_schedule_cron" {
+  type        = string
+  description = "cron defining how often cloud scheduler should trigger dqm"
+}
+
+variable "pause_scheduler" {
+  type        = string
+  description = "true or false, depending if scheduler should automatically trigger the workflow"
+}
