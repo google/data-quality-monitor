@@ -54,42 +54,46 @@
                           query:
                               alt: media
                       result: config_json_content
-
+                  - set_variables_from_config:
+                      assign:
+                        - source_project_id: $${config_json_content.body.source_table.project_id}
+                        - source_dataset_id: $${config_json_content.body.source_table.dataset_id}
+                        - source_table_name: $${config_json_content.body.source_table.table_name}
+                        - log_project_id: $${config_json_content.body.log_table.project_id}
+                        - log_dataset_id: $${config_json_content.body.log_table.dataset_id}
+                        - log_table_name: $${config_json_content.body.log_table.table_name}
                   - create_log_table_if_not_exists:
                       call: googleapis.bigquery.v2.jobs.query
                       args:
-                          projectId: $${config_json_content.body.log_table.project_id}
+                          projectId: $${log_project_id}
                           body:
                               useLegacySql: false
-                              location: ${BQ-LOCATION}
-                              projectId: $${config_json_content.body.log_table.project_id}
-                              query: $${"CREATE TABLE IF NOT EXISTS " + config_json_content.body.log_table.dataset_id + "." +config_json_content.body.log_table.table_name + " (dqm_version_id STRING,workflow_execution_id STRING,run_timestamp_utc STRING,project_id STRING,dataset_id STRING,table_name STRING,full_table_id STRING,log_type STRING,column STRING,error STRING,parser STRING,rule STRING,rule_params JSON,value STRING)"}
-
+                              projectId: $${log_project_id}
+                              query: $${"CREATE TABLE IF NOT EXISTS " + log_dataset_id + "." + log_table_name + " (dqm_version_id STRING,workflow_execution_id STRING,run_timestamp_utc STRING,project_id STRING,dataset_id STRING,table_name STRING,full_table_id STRING,log_type STRING,column STRING,error STRING,parser STRING,rule STRING,rule_params JSON,value STRING)"}
               - get_table_names:
                   call: googleapis.bigquery.v2.jobs.query
                   args:
-                      projectId: $${config_json_content.body.source_table.project_id}
+                      projectId: $${source_project_id}
                       body:
                           useLegacySql: false
-                          projectId: $${config_json_content.body.source_table.project_id}
-                          query: $${"SELECT table_name FROM " + config_json_content.body.source_table.dataset_id + ".INFORMATION_SCHEMA.TABLES WHERE table_name LIKE '" + config_json_content.body.source_table.table_name + "' ORDER BY creation_time DESC LIMIT " + config_json_content.body.source_table.n_tables_to_check }
+                          projectId: $${source_project_id}
+                          query: $${"SELECT table_name FROM " + source_dataset_id + ".INFORMATION_SCHEMA.TABLES WHERE table_name LIKE '" + source_table_name + "' ORDER BY creation_time DESC LIMIT " + config_json_content.body.source_table.n_tables_to_check }
                   result: queryResult
-
               - table_loop:
                   parallel:
                       for:
                           value: row
                           in: $${queryResult.rows}
                           steps:
-                              - set_base_variables:
+                              - set_base_variable:
                                   assign:
-                                      - dataset_id: $${config_json_content.body.source_table.dataset_id}
                                       - table_name: $${row.f[0].v}
+                                      - dataset_id: $${source_dataset_id}
                               - get_table_info:
                                   call: googleapis.bigquery.v2.tables.get
                                   args:
-                                    projectId: $${project_id}
-                                    datasetId: $${dataset_id}
+                                    projectId: $${source_project_id}
+                                    datasetId: $${source_dataset_id}
                                     tableId: $${table_name}
                                   result: table_info
                               - check_if_view:
@@ -101,17 +105,17 @@
                               - create_temp_table:
                                   call: googleapis.bigquery.v2.jobs.query
                                   args:
-                                    projectId: $${project_id}
+                                    projectId: $${source_project_id}
                                     body:
                                       useLegacySql: false
-                                      projectId: $${project_id}
+                                      projectId: $${source_project_id}
                                       maxResults: 1
-                                      query: $${"SELECT * FROM " + project_id + "." + dataset_id + "." + table_name}
+                                      query: $${"SELECT * FROM " + source_project_id + "." + source_dataset_id + "." + table_name}
                                   result: queryResponse
                               - getJob:
                                   call: googleapis.bigquery.v2.jobs.get
                                   args:
-                                    projectId: $${project_id}
+                                    projectId: $${source_project_id}
                                     jobId: $${queryResponse.jobReference.jobId}
                                   result: job
                               - getDestinationTable:
@@ -135,18 +139,18 @@
                                                                     - request_body:
                                                                         workflow_execution_id: $${workflow_execution_id}
                                                                         config_file: $${file.name}
-                                                                        display_source_table:
-                                                                            project_id: $${project_id}
-                                                                            dataset_id: $${config_json_content.body.source_table.dataset_id}
-                                                                            table_name: $${row.f[0].v}
                                                                         source_table:
-                                                                            project_id: $${project_id}
+                                                                            project_id: $${source_project_id}
                                                                             dataset_id: $${dataset_id}
                                                                             table_name: $${table_name}
+                                                                        display_source_table:
+                                                                            project_id: $${source_project_id}
+                                                                            dataset_id: $${source_dataset_id}
+                                                                            table_name: $${row.f[0].v}
                                                                         log_table:
-                                                                            project_id: $${config_json_content.body.log_table.project_id}
-                                                                            dataset_id: $${config_json_content.body.log_table.dataset_id}
-                                                                            table_name: $${config_json_content.body.log_table.table_name}
+                                                                            project_id: $${log_project_id}
+                                                                            dataset_id: $${log_dataset_id}
+                                                                            table_name: $${log_table_name}
                                                                         column_config:
                                                                             column: $${column}
                                                                             parser: $${config_json_content.body.columns[column].parser}

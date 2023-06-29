@@ -25,7 +25,6 @@ DQM is deployed using Terraform, which comes pre-installed on Google Cloud Shell
         * `project_id`: GCP Project to deploy DQM onto
     1. Optional:
         * `cloud_storage_region`: Cloud Storage Bucket region to store configuration files
-        * `biguery`: Location where bigquery queries are executed
         * `workflow_region`: Cloud Workflows region for DQM's workflow
         * `cloud_function_region`: Cloud Function region for DQM's core
         * `service_account_name`: Name for Service Account used by DQM

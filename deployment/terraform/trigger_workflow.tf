@@ -6,8 +6,7 @@ resource "google_workflows_workflow" "main" {
   project         = var.project_id
   source_contents = templatefile("../workflow.yaml", {
     CLOUD-FUNCTION-URL             = "${google_cloudfunctions_function.function.https_trigger_url}",
-    CLOUD-BUCKET-WITH-CONFIG-FILES = "${google_storage_bucket.config.name}",
-    BQ-LOCATION                    = "${var.bigquery_location}"
+    CLOUD-BUCKET-WITH-CONFIG-FILES = "${google_storage_bucket.config.name}"
   })
   depends_on = [
     google_storage_bucket.config,
