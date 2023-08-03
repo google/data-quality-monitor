@@ -86,7 +86,7 @@
                       body:
                           useLegacySql: false
                           projectId: $${source_project_id}
-                          query: $${"SELECT table_name FROM " + source_dataset_id + ".INFORMATION_SCHEMA.TABLES WHERE table_name LIKE '" + source_table_name + "' ORDER BY creation_time DESC LIMIT " + config_json_content.body.source_table.n_tables_to_check }
+                          query: $${"SELECT table_name FROM `" + source_dataset_id + ".INFORMATION_SCHEMA.TABLES` WHERE table_name LIKE '" + source_table_name + "' ORDER BY creation_time DESC LIMIT " + config_json_content.body.source_table.n_tables_to_check }
                   result: queryResult
               - table_loop:
                   parallel:
