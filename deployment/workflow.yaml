@@ -69,7 +69,7 @@
                           body:
                               useLegacySql: false
                               projectId: $${log_project_id}
-                              query: $${"CREATE TABLE IF NOT EXISTS " + log_dataset_id + "." + log_table_name + " (dqm_version_id STRING,workflow_execution_id STRING,run_timestamp_utc STRING,project_id STRING,dataset_id STRING,table_name STRING,full_table_id STRING,log_type STRING,column STRING,error STRING,parser STRING,rule STRING,rule_params JSON,value STRING)"}
+                              query: $${"CREATE TABLE IF NOT EXISTS `" + log_project_id + "." + log_dataset_id + "." + log_table_name + "` (dqm_version_id STRING,workflow_execution_id STRING,run_timestamp_utc STRING,project_id STRING,dataset_id STRING,table_name STRING,full_table_id STRING,log_type STRING,column STRING,error STRING,parser STRING,rule STRING,rule_params JSON,value STRING)"}
               - assign_query_result:
                   assign:
                     - queryResult: {"rows": [{"f": [{"v": "__TABLES__"}]}]}
