@@ -32,3 +32,21 @@ variable "pause_scheduler" {
   type        = string
   description = "true or false, depending if scheduler should automatically trigger the workflow"
 }
+
+variable "enable_notifications" {
+  type        = string
+  description = "true or false, if enabled the alerting policy will be enabled"
+  default     = "false"
+}
+
+variable "notification_email" {
+  type        = string
+  description = "email adress to receive execution notifications"
+  default     = ""
+}
+
+variable "notification_period" {
+  type        = string
+  description = "minimum time in between email notifications"
+  default     = "3600s"
+}

@@ -60,3 +60,15 @@ Nullable:
 * `rule`: Name of the rule, when log_type is rule
 * `rule_params`: Arguments passed to the rule, when log_type is rule
 * `value`: Data value causing failure, when log_type is not system
+
+## Alerting
+
+### Notification Policy
+
+By default, DQM deploys alerting policies that can be enabled during deployment by changing `enable_notifications` in the `tfvars` file. Policies can also be enabled/disabled individaully through the GCP UI in [Monitories Policies](https://console.cloud.google.com/monitoring/alerting/policies). DQM deploys the following policies:
+
+* **\[DQM\] Workflow execution error**: Triggered when an error/warning occurs in the Cloud Workflow
+* **\[DQM\] Cloud Function execution error**: Triggered when an error occurs in the Cloud Function
+* **\[DQM\] Rule or Parser violations**: Triggered when a rule is violated or parsing failure occured
+
+If enables, e-mail alerts are send to the `notification_email` in the `tfvars` file with the `notification_period` as minimum time in between notifications to prevent excessive alerting in the case of an error.

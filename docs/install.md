@@ -30,14 +30,17 @@ DQM is deployed using Terraform, which comes pre-installed on Google Cloud Shell
         * `service_account_name`: Name for Service Account used by DQM
         * `pause_scheduler`: Set to false to enable cloud scheduler
         * `trigger_schedule_cron`: Cron schedule to run DQM if scheduler is not paused
-1. Run `terraform init`
-1. Run `terraform plan -var-file="example.tfvars"`
-1. If prompted, review the `gcloud` authentication prompt and click "Authorize".
-1. Run `terraform apply -var-file="example.tfvars"`
-1. Review the deployment plan and type `yes` to confirm.
-1. Wait while terraform deploys DQM.
-1. If any errors occur, resolve them and re-run the `terraform apply ...` command.
-1. Otherwise, you have now successfully deployed DQM!
+        * `enable_notifications`: `true` or `false` to enable e-mail notifications for DQM runtime error and rule violations
+        * `notification_email`: Required if `enable_notifications` = `true`. e-mail to receive notifications
+        * `notification_period`: Minimum time in between e-mail alerts. Defaults to 3600s (1 hour)
+2. Run `terraform init`
+3. Run `terraform plan -var-file="example.tfvars"`
+4. If prompted, review the `gcloud` authentication prompt and click "Authorize".
+5. Run `terraform apply -var-file="example.tfvars"`
+6. Review the deployment plan and type `yes` to confirm.
+7. Wait while terraform deploys DQM.
+8. If any errors occur, resolve them and re-run the `terraform apply ...` command.
+9. Otherwise, you have now successfully deployed DQM!
 
 ### Setup
 
