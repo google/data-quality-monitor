@@ -1,0 +1,47 @@
+{
+  "parser": {
+    "parse_int": {
+      "rules": {
+        "is_within_strict_int_range": {
+          "args": {
+            "lower_bound": {},
+            "upper_bound": {}
+          }
+        }
+      }
+    },
+    "parse_float": {
+      "rules": {
+        "is_not_negative": {
+          "args": {}
+        },
+        "is_not_approx_zero": {
+          "args": {}
+        }
+      }
+    },
+    "parse_str": {
+      "rules": {
+        "is_email": {
+          "args": {}
+        },
+        "contains_at_sign": {
+          "args": {}
+        },
+        "contains_regex": {
+          "args": {
+            "regex": {}
+          }
+        },
+        "fully_matches_regex": {
+          "args": {
+            "regex": {}
+          }
+        },
+        "is_phone_number": {
+          "args": {}
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 resource "google_service_account" "main_account" {
-  account_id   = var.service_account_name
+  account_id   = "dqm-account"
   display_name = "DQM Service Account"
   project      = var.project_id
 }

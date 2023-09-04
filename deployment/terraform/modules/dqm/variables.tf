@@ -1,8 +1,3 @@
-variable "backend_base_url" {
-  type        = string
-  description = "base url of DQM backend. this is a relative path"
-  default     = "/api/v1" // starts with a slash '/' but should not end with slash '/'
-}
 variable "project_id" {
   type        = string
   description = "project id where to deploy dqm"
@@ -23,22 +18,14 @@ variable "cloud_function_region" {
   description = "region where to deploy the cloud function"
 }
 
-variable "dqm_config_bucket" {
-  type        = string
-  description = "bucket created to store multiple rule config files"
-  default     = ""
-}
-
 variable "trigger_schedule_cron" {
   type        = string
   description = "cron defining how often cloud scheduler should trigger dqm"
-  default     = "0 8 * * 1" //At 08:00 on every Monday
 }
 
 variable "pause_scheduler" {
   type        = string
   description = "true or false, depending if scheduler should automatically trigger the workflow"
-  default     = "true"
 }
 
 variable "enable_notifications" {
@@ -63,15 +50,4 @@ variable "dqm_resource_tag" {
   type        = string
   description = "tag used for all the dqm resources"
   default     = "dqm"
-}
-
-variable "webapp_members" {
-  type        = list(any)
-  description = "list of members who should be able to access webapp"
-}
-
-variable "webapp_backend_name" {
-  type        = string
-  description = "default service name for the dqm web"
-  default     = "default"
 }

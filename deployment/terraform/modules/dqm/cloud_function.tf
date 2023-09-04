@@ -20,6 +20,7 @@ data "archive_file" "zip_code_repo" {
     "pyproject.toml",
     "requirements-dev.txt",
     "README.md",
+    "webapp"
   ]
 }
 

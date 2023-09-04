@@ -18,6 +18,7 @@ for common use cases.
 
 * DQM is fully owned and managed by you, within your GCP project.
 * DQM os open-source and free - you only pay for the underlying GCP resource usage.
+* DQM has a Webapp to manage the configuarations etc. It is optional to install. Want to know more about DQM Webapp? [DQM Webapp](./docs/webapp.md)
 
 ## Resources
 
@@ -27,24 +28,21 @@ Join the [Google group](https://groups.google.com/g/data-quality-monitor-externa
 * Receive email updates on new features and updates.
 * Connect with DQM's developers and other users.
 
+![DQM and WebApp Deployment Architecture](./docs//images/deployment.png)
+
 ## [Installation](docs/install.md)
 
 DQM is deployed using Terraform, which comes pre-installed on Google Cloud Shell.
 
-
 Either follow the manual installation guide, linked below or directly click on the following Google Cloud console button and follow the interactive steps for the complete installation in your Google cloud account.
 
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://ssh.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/google/data-quality-monitor.git&cloudshell_tutorial=deployment/tutorial.md)
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/google/data-quality-monitor.git&cloudshell_git_branch=main&cloudshell_tutorial=deployment/gc_interactive_tutorial.md)
 
 Please follow along in the [installation docs](docs/install.md).
 
-
-
-
-
 ### [Configuration](docs/config.md)
 
-DQM is configured with simple JSON files, stored on Google Cloud Storage.
+DQM is configured with simple JSON files, stored on Google Cloud Storage. If you install DQM Webapp, you do not need to manage these configuration files via Json file. You can create as many config files you want via simple, dynamically generated form.
 
 You can read more in the [configuration docs](docs/config.md).
 

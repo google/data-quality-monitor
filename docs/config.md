@@ -4,6 +4,9 @@ DQM is configured with simple JSON files, stored on Google Cloud Storage.
 
 An example is provided in `deployment/config_template.json`, and below:
 
+
+`Note:` Please note that if you are utilizing the DQM Webapp, there is no requirement to manually configure this file or upload it to the Google Cloud Storage Bucket. Instead, you can conveniently create, modify, or delete these configuration files using dynamically generated forms in DQM Webapp. Simply input the required values, and a JSON file will be automatically generated and uploaded to the designated bucket.
+
 ```json
 {
   "service_account_email": "SERVICE-ACCOUNT-EMAIL",

@@ -24,6 +24,8 @@ If you want DQM to run on an automated schedule:
 
 If you want to run DQM manually:
 
+`Note:` If you are using DQM Webapp, you can visit `Workflow` page in webapp to trigger or view all the workflow executions. You can also view entire log, in case of failure.
+
 1. Navigate to [Cloud Workflows](https://console.cloud.google.com/workflows).
 1. Select the `dqm_trigger` workflow and click "Execute".
 1. Leave the input empty - `{}` and select "All calls" for the log level.
@@ -34,6 +36,9 @@ If you want to run DQM manually:
 ## Output
 
 ### Logs
+
+`Note:` If you are using DQM Webapp, you can visit `Rule Violations` page in webapp to view all the logs for your provided project, dataset and log table name.
+
 
 DQM outputs extensive logging, which can be leveraged for notifications or dashboards.
 
@@ -64,6 +69,8 @@ Nullable:
 ## Alerting
 
 ### Notification Policy
+
+`Note:` Management of `Notification or alerting` is yet available in Webapp.
 
 By default, DQM deploys alerting policies that can be enabled during deployment by changing `enable_notifications` in the `tfvars` file. Policies can also be enabled/disabled individaully through the GCP UI in [Monitories Policies](https://console.cloud.google.com/monitoring/alerting/policies). DQM deploys the following policies:
 

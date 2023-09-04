@@ -23,6 +23,7 @@ DQM is deployed using Terraform, which comes pre-installed on Google Cloud Shell
    There you can set
     1. Required:
         * `project_id`: GCP Project to deploy DQM onto
+        * `backend_base_url`: Prefilled value = "/api/v1". Changes when new version of backed is released.
     1. Optional:
         * `cloud_storage_region`: Cloud Storage Bucket region to store configuration files
         * `workflow_region`: Cloud Workflows region for DQM's workflow
@@ -33,14 +34,41 @@ DQM is deployed using Terraform, which comes pre-installed on Google Cloud Shell
         * `enable_notifications`: `true` or `false` to enable e-mail notifications for DQM runtime error and rule violations
         * `notification_email`: Required if `enable_notifications` = `true`. e-mail to receive notifications
         * `notification_period`: Minimum time in between e-mail alerts. Defaults to 3600s (1 hour)
+
+## DQM can be installed with or without Webapp
+
+To launch an interactive step-by-step installation, you can run the following command. In this case, you do not need to read the rest of the instructions written here.
+
+`Note:` This command can be executed ONLY in Google Cloudshell.
+
+```sh
+cloudshell launch_tutorial $(git rev-parse --show-toplevel)/deployment/gc_interactive_tutorial.md
+```
+
+  #### DQM Installation with Webapp
+
 2. Run `terraform init`
 3. Run `terraform plan -var-file="example.tfvars"`
 4. If prompted, review the `gcloud` authentication prompt and click "Authorize".
 5. Run `terraform apply -var-file="example.tfvars"`
 6. Review the deployment plan and type `yes` to confirm.
 7. Wait while terraform deploys DQM.
-8. If any errors occur, resolve them and re-run the `terraform apply ...` command.
-9. Otherwise, you have now successfully deployed DQM!
+8. If any errors occur, resolve them and re-run the `terraform apply -var-file="example.tfvars"` command.
+9. Otherwise, you have now successfully deployed DQM and DQM Webapp.
+10. DQM Frontend must be accisble via this URL : https://frontend-dot-vmmishra-intern-project-2023.ew.r.appspot.com/
+
+
+  #### DQM Installation without Webapp
+
+2. Run `terraform init -target=module.dqm`
+3. Run `terraform plan -target=module.dqm -var-file="example.tfvars"`
+4. If prompted, review the `gcloud` authentication prompt and click "Authorize".
+5. Run `terraform apply -target=module.dqm -var-file="example.tfvars"`
+6. Review the deployment plan and type `yes` to confirm.
+7. Wait while terraform deploys DQM.
+8. If any errors occur, resolve them and re-run the `terraform apply -target=module.dqm -var-file="example.tfvars"` command.
+9. Otherwise, you have now successfully deployed DQM.
+10. DQM Frontend must be accisble via this URL : https://frontend-dot-vmmishra-intern-project-2023.ew.r.appspot.com/
 
 ### Setup
 
@@ -63,7 +91,7 @@ DQM can be updated and re-deployed seamlessly:
 1. Open the Google Cloud Project where you have deployed DQM.
 1. Open the [Cloud Shell Terminal](https://shell.cloud.google.com).
 1. Run `git pull` to sync the latest code.
-1. Run `terraform plan -var-file="example.tfvars"`
+1. Run `terraform plan -var-file="example.tfvars"` [change it based on whether you want to ]
 1. If prompted, review the `gcloud` authentication prompt and click "Authorize".
 1. Run `terraform apply -var-file="example.tfvars"`
 1. Review the deployment plan and type `yes` to confirm.
@@ -73,7 +101,7 @@ DQM can be updated and re-deployed seamlessly:
 
 ### Uninstallation
 
-DQM is self-contained and can be removed easily.
+DQM is self-contained and can be removed easily. You can choose to remove DQM Webapp alone as well.
 
 1. Open the Google Cloud Project where you have deployed DQM.
 1. Open the [Cloud Shell Terminal](https://shell.cloud.google.com).
@@ -114,8 +142,9 @@ Note: These will not be disabled automatically upon uninstalling DQM.
 
 ### Service Account
 
-Terraform will automatically create a service account with the following permissions:
+Terraform will automatically creates a/two service account - One for the DQM and other one for the DQM Webapp..
 
+DQM Service account has following roles assigned;
 * BigQuery Data Editor (`roles/bigquery.dataEditor`)
 * BigQuery Resource Viewer (`roles/bigquery.resourceViewer`)
 * BigQuery User (`roles/bigquery.user`)
@@ -123,3 +152,10 @@ Terraform will automatically create a service account with the following permiss
 * Storage Object Viewer (`roles/storage.objectViewer`)
 * Logging Log Writer (`roles/logging.logWriter`)
 * Workflows Invoker (`roles/workflows.invoker`)
+
+DQM Webapp Service account has following roles assigned;
+* Storage Object User (`roles/storage.objectUser`)
+* BigQuery Data Editor (`roles/bigquery.dataEditor`)
+* Workflow Editor (`rroles/workflows.editor`)
+* Cloud Scheduler Admin (`roles/cloudscheduler.admin`)
+* Bigquery Metadata Viewer (`roles/bigquery.metadataViewer`)

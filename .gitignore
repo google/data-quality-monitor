@@ -2,15 +2,21 @@
 __pycache__/
 *.py[cod]
 *$py.class
+**/.DS_Store
 
 # Environments
 venv/
+
+#dist folder
+dist/
 
 # Config
 *.env
 !example.env
 *.tfvars
 !example.tfvars
+*.terraform*
+*.tfstate*
 
 # Data
 *.csv
@@ -20,3 +26,4 @@ venv/
 
 # Debugging data
 debug/
+webapp/frontend/.env.dev
