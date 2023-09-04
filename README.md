@@ -31,7 +31,16 @@ Join the [Google group](https://groups.google.com/g/data-quality-monitor-externa
 
 DQM is deployed using Terraform, which comes pre-installed on Google Cloud Shell.
 
+
+Either follow the manual installation guide, linked below or directly click on the following Google Cloud console button and follow the interactive steps for the complete installation in your Google cloud account.
+
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://ssh.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/google/data-quality-monitor.git&cloudshell_tutorial=deployment/tutorial.md)
+
 Please follow along in the [installation docs](docs/install.md).
+
+
+
+
 
 ### [Configuration](docs/config.md)
 
