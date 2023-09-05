@@ -121,13 +121,14 @@
                                       useLegacySql: false
                                       projectId: $${source_project_id}
                                       maxResults: 1
-                                      query: $${"SELECT * FROM " + source_project_id + "." + source_dataset_id + "." + table_name}
+                                      query: $${"SELECT * FROM `" + source_project_id + "." + source_dataset_id + "." + table_name + "`"}
                                   result: queryResponse
                               - getJob:
                                   call: googleapis.bigquery.v2.jobs.get
                                   args:
                                     projectId: $${source_project_id}
                                     jobId: $${queryResponse.jobReference.jobId}
+                                    location: $${queryResponse.jobReference.location}
                                   result: job
                               - getDestinationTable:
                                   assign:
