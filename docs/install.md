@@ -55,7 +55,12 @@ cloudshell launch_tutorial $(git rev-parse --show-toplevel)/deployment/gc_intera
 7. Wait while terraform deploys DQM.
 8. If any errors occur, resolve them and re-run the `terraform apply -var-file="example.tfvars"` command.
 9. Otherwise, you have now successfully deployed DQM and DQM Webapp.
-10. DQM Frontend must be accisble via this URL : https://frontend-dot-vmmishra-intern-project-2023.ew.r.appspot.com/
+10. DQM Frontend must be accessible via this URL : https://frontend-dot-`project_id`.`app_engine_location`.r.appspot.com/
+11. You can get the correct url by running the following command in your cloudshell
+
+```sh
+gcloud app services browse frontend
+```
 
 
   #### DQM Installation without Webapp
@@ -68,7 +73,6 @@ cloudshell launch_tutorial $(git rev-parse --show-toplevel)/deployment/gc_intera
 7. Wait while terraform deploys DQM.
 8. If any errors occur, resolve them and re-run the `terraform apply -target=module.dqm -var-file="example.tfvars"` command.
 9. Otherwise, you have now successfully deployed DQM.
-10. DQM Frontend must be accisble via this URL : https://frontend-dot-vmmishra-intern-project-2023.ew.r.appspot.com/
 
 ### Setup
 
