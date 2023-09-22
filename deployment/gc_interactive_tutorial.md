@@ -35,6 +35,12 @@
 `Note:` In order to be able to install DQM successfully, you need to have billing enabled for your project.
 <h2 id="enable-apis" data-text="enable APIs">Enable APIs</h2>
 
+<p>First set the project Id to gcloud config:</p>
+
+```sh
+gcloud config set project <walkthrough-project-name/>
+```
+
 `Note:` In order to install DQM successfully, you need to have following APIs enabled. In the following list, if there is any
 
 For your project - `<walkthrough-project-name/>` following APIs must be enabled.
