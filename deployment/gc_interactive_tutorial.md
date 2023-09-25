@@ -63,6 +63,7 @@ cloudshell edit $(git rev-parse --show-toplevel)/deployment/terraform/example.tf
 - `enable_notifications`: `true` or `false` to enable e-mail notifications for DQM runtime error and rule violations
 - `notification_email`: Required if `enable_notifications = true`. e-mail to receive notifications
 - `notification_period`: Minimum time in between e-mail alerts. Defaults to 3600s (1 hour)
+- `webapp_members`: Members who are allowed to access webapp. It can be an array of users email address, groups, service accounts, etc. 
 
 <p>Did you save the config file with relevant information? Then click <strong>Next</strong></p>
 

@@ -13,6 +13,8 @@ To get started with local development, follow these steps:
     cd webapp/frontend
     npm install
     ```
+* Make a copy of `.env.example` file and save it as `.env.dev`. Set the environment variables for your development environment.
+
 * Start the frontend by running:
     ```
     npm run dev
