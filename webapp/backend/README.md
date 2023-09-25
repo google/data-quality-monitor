@@ -1,6 +1,6 @@
-# Getting Started with DQM Webapp - Frontend
+# Getting Started with DQM Webapp - Backend
 
-The Data Quality Monitor frontend is developed in React using Typescript language. The frontend webapp is created using Google's Material UI framework. Webapp consists of frontend and backend.
+The Data Quality Monitor frontend is developed in React using Typescript language. DQM frontend is served by backend APIs. These APIs are also developed in Typescript.
 
 ## Local Development
 To get started with local development, follow these steps:
@@ -8,17 +8,25 @@ To get started with local development, follow these steps:
     ```
     git clone https://github.com/google/data-quality-monitor.git
     ```
-* Install the frontend dependencies by navigating to the `webapp/frontend` directory and running:
+* Install the frontend dependencies by navigating to the `webapp/backend` directory and running:
     ```
-    cd webapp/frontend
+    cd webapp/backend
     npm install
+    npm run build-dev
     ```
-* Start the frontend by running:
+* Start the backend by running:
     ```
     npm run dev
     ```
+This command runs the app in development mode, and you can access your backend APIs at this path: http://localhost:5000/....
 
-This command runs the app in development mode, and you can access it in your web browser at http://localhost:3000.
+
+
+## Swagger
+
+All the backend APIs are documented here at this URL after successful build.
+http://localhost:5000/docs/
+
 
 ## Linting
 You can run linting on the project using the following command:
@@ -55,3 +63,10 @@ The build is minified, and the filenames include the hashes.\
 Your app is ready to be deployed!
 
 This command is specifically tailored for deploying the application on Google App Engine.
+
+### To run the app in Google Appengine
+
+Run the following command to start the backend in production environment:
+```
+npm run start
+```
