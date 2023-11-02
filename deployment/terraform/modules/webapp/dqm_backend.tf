@@ -28,10 +28,10 @@ resource "google_app_engine_standard_app_version" "backend" {
   version_id                = "v1"
   service                   = "default"
   project                   = var.project_id
-  runtime                   = "nodejs20" # Replace with your desired Node.js runtime version
+  runtime                   = "nodejs20"
   instance_class            = "F4_1G"
   service_account           = "${google_service_account.dqm_webapp_service_account.account_id}@${var.project_id}.iam.gserviceaccount.com"
-  delete_service_on_destroy = false
+  delete_service_on_destroy = true
   lifecycle {
     prevent_destroy = true
   }
@@ -43,9 +43,6 @@ resource "google_app_engine_standard_app_version" "backend" {
       source_url = "https://storage.googleapis.com/${google_storage_bucket.webapp_upload_bucket.name}/${google_storage_bucket_object.backend_upload_object.name}"
     }
   }
-  depends_on = [
-    google_storage_bucket_object.backend_upload_object,
-  ]
 }
 
 resource "google_app_engine_application_url_dispatch_rules" "backend-dispatch" {

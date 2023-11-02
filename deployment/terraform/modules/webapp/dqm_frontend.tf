@@ -69,4 +69,5 @@ resource "google_iap_web_type_app_engine_iam_binding" "binding" {
   app_id  = var.project_id
   role    = "roles/iap.httpsResourceAccessor"
   members = var.webapp_members
+  depends_on = [google_project_service.iap ]
 }
