@@ -1,4 +1,6 @@
 resource "google_monitoring_notification_channel" "basic" {
+  count = var.notification_email != "" ? 1 : 0
+
   project      = var.project_id
   display_name = "DQM Notification Channel (${var.notification_email})"
   type         = "email"
@@ -20,7 +22,7 @@ resource "google_monitoring_alert_policy" "dqm_workflow_errors" {
     display_name = "Workflow warnings and errors"
 
     condition_matched_log {
-      filter = "resource.labels.workflow_id=\"${google_workflows_workflow.main.name}\" AND  severity>=WARNING"
+      filter = "resource.labels.workflow_id=\"${google_workflows_workflow.main.name}\" AND severity>=WARNING"
     }
   }
 
@@ -31,7 +33,7 @@ resource "google_monitoring_alert_policy" "dqm_workflow_errors" {
     auto_close = "604800s"
   }
 
-  notification_channels = [google_monitoring_notification_channel.basic.name]
+  notification_channels = length(google_monitoring_notification_channel.basic) > 0 ? [google_monitoring_notification_channel.basic[0].name] : []
 
   documentation {
     content   = "This alert indicates that an error occurred in the DQM Workflow. Review the logs [here](https://console.cloud.google.com/logs/viewer?project=${var.project_id}&advancedFilter=resource.labels.workflow_id=\"${google_workflows_workflow.main.name}\"%20AND%20severity>=WARNING)"
@@ -60,7 +62,7 @@ resource "google_monitoring_alert_policy" "dqm_cloud_function_errors" {
     auto_close = "604800s"
   }
 
-  notification_channels = [google_monitoring_notification_channel.basic.name]
+  notification_channels = length(google_monitoring_notification_channel.basic) > 0 ? [google_monitoring_notification_channel.basic[0].name] : []
 
   documentation {
     content   = "This alert indicates that an error occurred in the DQM Cloud Function. Review the logs [here](https://console.cloud.google.com/logs/viewer?project=${var.project_id}&advancedFilter=(resource.type=\"cloud_function\" resource.labels.function_name=\"${google_cloudfunctions_function.function.name}\"\\)%20AND%20(severity>=ERROR%20OR%20textPayload:\"finished%20with%20status:%20'error'\"))"
@@ -89,10 +91,10 @@ resource "google_monitoring_alert_policy" "dqm_violations" {
     auto_close = "604800s"
   }
 
-  notification_channels = [google_monitoring_notification_channel.basic.name]
+  notification_channels = length(google_monitoring_notification_channel.basic) > 0 ? [google_monitoring_notification_channel.basic[0].name] : []
 
   documentation {
-    content   = "This alert indicates that a rule was violated, a parser failed or a rule error occured. Review the log table to see more details."
+    content   = "This alert indicates that a rule was violated, a parser failed or a rule error occurred. Review the log table to see more details."
     mime_type = "text/markdown"
   }
 }

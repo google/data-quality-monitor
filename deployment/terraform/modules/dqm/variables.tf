@@ -37,7 +37,7 @@ variable "enable_notifications" {
 variable "notification_email" {
   type        = string
   description = "email adress to receive execution notifications"
-  default     = ""
+  default     = null
 }
 
 variable "notification_period" {
