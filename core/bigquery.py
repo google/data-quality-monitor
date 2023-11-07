@@ -292,15 +292,16 @@ def upload_rows(bq_legacy_client: BigQueryLegacyClient,
     Returns:
         * List of errors, if any
     """
-    result = bq_legacy_client.insert_rows_json(table_metadata.full_table_id,
-                                               rows)
-    # result is empty if no errors occurred
-    for row in result:
-        # Note:
-        # Failure here usually indicates a BigQuery log table schema issue
-        # We assume all rows will fail with the same error,
-        # so we only log one row to prevent polluting cloud logging
-        # and immediately return to stop processing data further
-        if 'errors' in row and len(row['errors']) > 0:
-            return [str(e) for e in row['errors']]
+    if len(rows) > 0:
+        result = bq_legacy_client.insert_rows_json(table_metadata.full_table_id,
+                                                rows)
+        # result is empty if no errors occurred
+        for row in result:
+            # Note:
+            # Failure here usually indicates a BigQuery log table schema issue
+            # We assume all rows will fail with the same error,
+            # so we only log one row to prevent polluting cloud logging
+            # and immediately return to stop processing data further
+            if 'errors' in row and len(row['errors']) > 0:
+                return [str(e) for e in row['errors']]
     return []
