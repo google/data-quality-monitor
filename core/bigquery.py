@@ -64,7 +64,7 @@ class TableMetadata:
 def build_table_metadata(full_table_id: str) -> TableMetadata:
     """
     Builds a TableMetadata object from a BigQuery full table ID,
-    i.e. project_id.dataset_id.table_name
+    i.e. project_id.dataset_id.table_name.
 
     Args:
         * full_table_id: BigQuery full table ID
@@ -293,8 +293,8 @@ def upload_rows(bq_legacy_client: BigQueryLegacyClient,
         * List of errors, if any
     """
     if len(rows) > 0:
-        result = bq_legacy_client.insert_rows_json(table_metadata.full_table_id,
-                                                rows)
+        result = bq_legacy_client.insert_rows_json(
+            table_metadata.full_table_id, rows)
         # result is empty if no errors occurred
         for row in result:
             # Note:
