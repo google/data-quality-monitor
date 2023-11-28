@@ -9,4 +9,4 @@ google-cloud-bigquery-storage==2.16.0
 pyarrow>=14.0.1
 pydantic==1.10.2
 typing_extensions==4.3.0
-Werkzeug==2.2.2
+Werkzeug==2.3.8
