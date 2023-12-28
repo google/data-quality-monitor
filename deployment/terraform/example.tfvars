@@ -1,7 +1,9 @@
-project_id            = "YOUR-PROJECT-ID"
-cloud_storage_region  = "EU"           # or US
-workflow_region       = "europe-west1" # europe-west1
-cloud_function_region = "europe-west1" # europe-west1
+project_id             = "YOUR-PROJECT-ID"
+cloud_storage_region   = "EU"           # or US
+workflow_region        = "europe-west1" # europe-west1
+cloud_function_region  = "europe-west1" # europe-west1
+# deployment_name = "data-quality-monitor"
+# backend_name = "data-quality-monitor" # uncomment if there is already a default App Engine application running
 
 # DQM can send you email alerts when an error occured or a rule was violated. This is disabled by default but uncomment and complete the below to enable.
 # enable_notifications = "true"

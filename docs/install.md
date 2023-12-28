@@ -48,6 +48,7 @@ cloudshell launch_tutorial $(git rev-parse --show-toplevel)/deployment/gc_intera
   #### DQM Installation with Webapp
 
 1. when installing the webapp make sure that you have app engine enable in your project. You can verify this by running `gcloud app describe --project=YOUR_PROJECT_ID`, if not, run `gcloud app create --project=YOUR_PROJECT_ID` to enable.
+1. If there is already a `Default` App Engine Application running in your project, make sure you set the `backend_name` to something else in the `example.tfvars` file.
 1. Run `terraform init`
 1. Run `terraform plan -var-file="example.tfvars"`
 1. If prompted, review the `gcloud` authentication prompt and click "Authorize".

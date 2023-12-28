@@ -1,5 +1,5 @@
 resource "google_service_account" "main_account" {
-  account_id   = "dqm-account"
+  account_id   = var.deployment_name
   display_name = "DQM Service Account"
   project      = var.project_id
 }

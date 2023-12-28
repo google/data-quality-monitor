@@ -54,7 +54,7 @@ resource "google_storage_bucket_object" "cf_upload_object" {
 }
 
 resource "google_cloudfunctions_function" "function" {
-  name        = "data-quality-monitor"
+  name        = var.deployment_name
   description = "Data quality monitor function to check rules on biquery datasets and log violations"
   runtime     = "python310"
   region      = var.cloud_function_region

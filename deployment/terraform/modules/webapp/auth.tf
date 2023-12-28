@@ -1,5 +1,5 @@
 resource "google_service_account" "dqm_webapp_service_account" {
-  account_id   = "dqm-webapp"
+  account_id   = "${var.deployment_name}-web-app"
   display_name = "DQM Webapp Service Account. This is common for both frontend and backend"
   project      = var.project_id
 }

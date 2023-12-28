@@ -51,3 +51,9 @@ variable "dqm_resource_tag" {
   description = "tag used for all the dqm resources"
   default     = "dqm"
 }
+
+variable "deployment_name" {
+  type        = string
+  description = "Name of the DQM deployment"
+  default     = "data-quality-monitor"
+}

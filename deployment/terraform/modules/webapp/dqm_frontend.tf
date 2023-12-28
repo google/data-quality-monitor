@@ -44,7 +44,7 @@ resource "google_storage_bucket_object" "form_config_upload_object" {
 
 resource "google_app_engine_standard_app_version" "frontend" {
   version_id                = "v1"
-  service                   = "frontend"
+  service                   = "${var.deployment_name}-frontend"
   project                   = var.project_id
   runtime                   = "nodejs20" # Replace with your desired Node.js runtime version
   instance_class            = "F4_1G"

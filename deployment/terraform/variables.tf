@@ -75,3 +75,15 @@ variable "webapp_backend_name" {
   description = "default service name for the dqm web"
   default     = "default"
 }
+
+variable "deployment_name" {
+  type        = string
+  description = "Name of the DQM deployment"
+  default     = "data-quality-monitor"
+}
+
+variable "backend_name" {
+  type        = string
+  description = "Name of the DQM webapp backend"
+  default     = "default"
+}

@@ -26,14 +26,14 @@ resource "google_storage_bucket_object" "backend_upload_object" {
 
 resource "google_app_engine_standard_app_version" "backend" {
   version_id                = "v1"
-  service                   = "default"
+  service                   = var.backend_name
   project                   = var.project_id
   runtime                   = "nodejs20"
   instance_class            = "F4_1G"
   service_account           = "${google_service_account.dqm_webapp_service_account.account_id}@${var.project_id}.iam.gserviceaccount.com"
   delete_service_on_destroy = true
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
   entrypoint {
     shell = "NODE_ENV=production && npm run start"

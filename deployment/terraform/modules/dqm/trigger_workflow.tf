@@ -1,5 +1,5 @@
 resource "google_workflows_workflow" "main" {
-  name            = "dqm_trigger"
+  name            = "${var.deployment_name}-trigger"
   region          = var.workflow_region
   description     = "Workflow that retrieves config from cloud storage and triggers cloud function"
   service_account = google_service_account.main_account.id
