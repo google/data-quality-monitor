@@ -11,15 +11,6 @@ resource "google_storage_bucket" "webapp_form_config_bucket" {
   uniform_bucket_level_access = true
   force_destroy               = true
   project                     = var.project_id
-  lifecycle_rule {
-    condition {
-      age = 1
-    }
-    action {
-      type = "Delete"
-    }
-  }
-
 }
 
 resource "google_storage_bucket" "webapp_upload_bucket" {
