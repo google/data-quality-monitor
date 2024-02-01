@@ -11,8 +11,9 @@
     "dataset_id": "BIGQUERY-DATASET-TO-STORE-LOGS",
     "table_name": "BIGQUERY-TABLE-TO-STORE-LOGS"
   },
-  "columns": {
-    "COLUMN-A-NAME": {
+  "columns": [
+    {
+      "column_name": "COLUMN-A-NAME",
       "parser": "parse_int",
       "rules": [
         {
@@ -24,7 +25,8 @@
         }
       ]
     },
-    "COLUMN-B-NAME": {
+    {
+      "column_name": "COLUMN-B-NAME",
       "parser": "parse_float",
       "rules": [
         {
@@ -36,5 +38,5 @@
         }
       ]
     }
-  }
+  ]
 }
