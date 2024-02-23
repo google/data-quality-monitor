@@ -28,7 +28,8 @@ from google.cloud.bigquery_storage import BigQueryReadClient
 from google.cloud.bigquery_storage import ReadSession
 from google.cloud.exceptions import NotFound
 
-from .auth import Credentials
+from core.auth import Credentials
+from core.helpers import parse_column_path
 
 BQ_SCOPES = ['https://www.googleapis.com/auth/bigquery']
 
@@ -189,7 +190,6 @@ def get_readrows_iterator(
         read_session=requested_session,
         max_stream_count=1,
     )
-
     # Use 0th stream because because max_stream_count=1
     stream_name = session.streams[0].name
 
@@ -201,38 +201,69 @@ def get_readrows_iterator(
     return cast(Iterable[Mapping], rows)
 
 
-def get_cells_iterator(bq_read_client: BigQueryReadClient,
-                       table_metadata: TableMetadata,
-                       column: str) -> Generator[Any, None, None]:
-    """
-    Get an Iterator of cell values with the requested columns of the table,
-    using an authenticated BigQuery Storage API client.
+def get_cells_iterator(
+    bq_read_client: BigQueryReadClient,
+    table_metadata: TableMetadata,
+    column: str,
+) -> Generator[Any, None, None]:
+    """Retrieves an iterator of cell values for a specified column, optimized
+    for both simple and nested column
 
-    Note: Does support nested columns.
+  access, including handling special value structures with dynamic value types
+  for nested columns.
 
-    Args:
-        * bq_read_client: BigQuery Storage API Read client
-        * table_metadata: TableMetadata object
-        * column : Column name to select
+  Args:
+      bq_read_client (BigQueryReadClient): The BigQuery Storage API Read client.
+      table_metadata (TableMetadata): The table's metadata.
+      column (str): The column name, supporting nested fields and array indices
+        for complex cases.
 
-    Returns:
-        * Iterator of cell values
-    """
-    nested_columns = column.split('.')
-    parent_column = nested_columns[0]
+  Returns:
+      Generator[Any, None, None]: An iterator over cell values.
+  """
+    # Check if the column path indicates a simple column access
+    if "." not in column and "[" not in column:
+        # Optimize data retrieval for simple column access
+        rows = get_readrows_iterator(bq_read_client,
+                                     table_metadata, [column],
+                                     data_format=DataFormat.AVRO)
+        for row in rows:
+            yield row.get(column)
+    else:
+        # Handle nested and special value structures as before
+        nested_columns = parse_column_path(column)
+        parent_column = nested_columns[0][0]
 
-    rows = get_readrows_iterator(bq_read_client,
-                                 table_metadata, [parent_column],
-                                 data_format=DataFormat.AVRO)
+        rows = get_readrows_iterator(
+            bq_read_client,
+            table_metadata,
+            [parent_column],
+            data_format=DataFormat.AVRO,
+        )
 
-    for row in rows:
-        value = row
-        for nested_column in nested_columns:
-            try:
-                value = value[nested_column]
-            except KeyError:
-                raise KeyError(f'{nested_column} was not found.')
-        yield value
+        for current_value in rows:
+            for column_name, key in nested_columns:
+                if isinstance(current_value, dict):
+                    current_value = current_value.get(column_name)
+                elif isinstance(current_value, list) and key:
+                    current_value = next(
+                        (item for item in current_value
+                         if item.get(column_name) == key),
+                        None,
+                    )
+
+                if isinstance(current_value, dict) and "value" in current_value:
+                    extracted_value = next(
+                        (value for key, value in current_value["value"].items()
+                         if value is not None),
+                        None,
+                    )
+                    current_value = (extracted_value if extracted_value
+                                     is not None else current_value)
+
+                if current_value is None:
+                    break
+            yield current_value
 
 
 def get_table(bq_legacy_client: BigQueryLegacyClient,
@@ -293,8 +324,8 @@ def upload_rows(bq_legacy_client: BigQueryLegacyClient,
         * List of errors, if any
     """
     if len(rows) > 0:
-        result = bq_legacy_client.insert_rows_json(
-            table_metadata.full_table_id, rows)
+        result = bq_legacy_client.insert_rows_json(table_metadata.full_table_id,
+                                                   rows)
         # result is empty if no errors occurred
         for row in result:
             # Note:

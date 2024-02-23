@@ -87,7 +87,7 @@ An example is provided in `deployment/config_template.json`, and below:
     * `table_name`: BigQuery table name
 
 * BigQuery table `columns`: (mapping)
-  * key: BigQuery table column name
+  * key: BigQuery table column name. Supports nested (Repeated and Nullable records BQ data type) columns. More details [here]()
   * value:
     * `parser`: [Parser name](#parsers)
     * `rules`: (list)
@@ -111,6 +111,40 @@ Advanced:
 * Allow the DQM Service Account to [impersonate](https://cloud.google.com/iam/docs/impersonating-service-accounts#impersonate-sa-level) this new Service Account.
 * Grant Service Account Token Creator (`roles/iam.serviceAccountTokenCreator`) to the DQM Service Account.
 * Specify `service_account_email` in your config.
+
+### Nested column logic for column name
+
+The DQM configuration file allows you to target specific columns within complex data structures in your BigQuery tables. Here's how to handle nested columns and extract values from arrays of structs:
+
+**1. Nested Columns**
+
+* Use dot notation to reference columns within nested structures (STRUCTs in BigQuery).
+
+**Example:**
+
+```
+column2.nested_column1 
+```
+
+*  This targets `nested_column1`  within the `column2` struct.
+
+**2. Key-Value Logic within Arrays**
+
+* Employ the `key[some_value]` syntax to extract values from arrays of structs where the elements have a `key` field.
+
+**Example:**
+
+```
+event_params.key[ga_session_id]
+```
+
+* This targets the `value` where the corresponding `key` is "ga_session_number" within the `event_params` array.
+
+**Key Points:**
+
+* **Matching Logic:** The `key[some_value]` syntax will extract the **first** matching value within the array.
+* **Parsers:** Choose parsers that are compatible with the data type of the values you are extracting (e.g., `parse_int` for integers, `parse_str` for strings).
+* **Custom Rules:** For more complex logic or to process multiple values with the same key, you can write custom Python rules.
 
 ## Parsers
 

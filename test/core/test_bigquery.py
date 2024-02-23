@@ -17,6 +17,8 @@ limitations under the License.
 from collections.abc import Iterable
 import os
 import unittest
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 from google.cloud.bigquery import Client as BigQueryLegacyClient
 from google.cloud.bigquery_storage import BigQueryReadClient
@@ -27,6 +29,7 @@ from core.auth import ImpersonatedCredentials
 from core.auth import OAuthCredentials
 from core.bigquery import get_bq_legacy_client
 from core.bigquery import get_bq_read_client
+from core.bigquery import get_cells_iterator
 from core.bigquery import get_readrows_iterator
 from core.bigquery import TableMetadata
 
@@ -92,3 +95,155 @@ class BigQueryReadRowsTest(unittest.TestCase):
                                        table_name=os.environ['TEST_TABLE_NAME'])
         rows = get_readrows_iterator(self.bqs_client, table_metadata)
         self.assertTrue(isinstance(rows, Iterable))
+
+
+class TestGetCellsIterator(unittest.TestCase):
+
+    @patch('core.bigquery.get_readrows_iterator')
+    def test_get_cells_iterator_single_column(self, mock_get_readrows_iterator):
+        mock_get_readrows_iterator.return_value = iter([
+            {
+                "column_name": 10
+            },
+            {
+                "column_name": 20
+            },
+        ])
+        mock_table_metadata = TableMetadata(project_id="test-project",
+                                            dataset_id="test-dataset",
+                                            table_name="test-table")
+        result = list(
+            get_cells_iterator(MagicMock(spec=BigQueryReadClient),
+                               mock_table_metadata, "column_name"))
+        self.assertEqual(result, [10, 20])
+
+    @patch('core.bigquery.get_readrows_iterator')
+    def test_get_cells_iterator_nested_column(self, mock_get_readrows_iterator):
+        mock_get_readrows_iterator.return_value = iter([
+            {
+                "c": {
+                    "nested": {
+                        "column_name": "value1"
+                    }
+                }
+            },
+            {
+                "c": {
+                    "nested": {
+                        "column_name": "value2"
+                    }
+                }
+            },
+        ])
+        mock_table_metadata = TableMetadata(project_id="test-project",
+                                            dataset_id="test-dataset",
+                                            table_name="test-table")
+        result = list(
+            get_cells_iterator(MagicMock(spec=BigQueryReadClient),
+                               mock_table_metadata, "c.nested.column_name"))
+        self.assertEqual(result, ["value1", "value2"])
+
+    @patch('core.bigquery.get_readrows_iterator')
+    def test_get_cells_iterator_extract_special_value(
+            self, mock_get_readrows_iterator):
+        mock_data = [{
+            "event_params": [{
+                "key": "ga_session_number",
+                "value": {
+                    'string_value': None,
+                    'int_value': 1,
+                    'float_value': None,
+                    'double_value': None
+                }
+            },]
+        }]
+        mock_get_readrows_iterator.return_value = iter(mock_data)
+        mock_table_metadata = TableMetadata(project_id="test-project",
+                                            dataset_id="test-dataset",
+                                            table_name="test-table")
+        result = list(
+            get_cells_iterator(MagicMock(spec=BigQueryReadClient),
+                               mock_table_metadata,
+                               "event_params.key[ga_session_number]"))
+        self.assertEqual(result, [1])
+        mock_get_readrows_iterator.assert_called_once()
+
+    @patch('core.bigquery.get_readrows_iterator')
+    def test_get_cells_iterator_extract_double_nested_value(
+            self, mock_get_readrows_iterator):
+        mock_data = [{
+            "event_params": [{
+                "key": "ga_session_number",
+                "value": {
+                    'string_value': {
+                        "deep_column": 1
+                    }
+                }
+            },]
+        }]
+        mock_get_readrows_iterator.return_value = iter(mock_data)
+        mock_table_metadata = TableMetadata(project_id="test-project",
+                                            dataset_id="test-dataset",
+                                            table_name="test-table")
+        result = list(
+            get_cells_iterator(
+                MagicMock(spec=BigQueryReadClient), mock_table_metadata,
+                "event_params.key[ga_session_number].deep_column"))
+        self.assertEqual(result, [1])
+        mock_get_readrows_iterator.assert_called_once()
+
+    @patch('core.bigquery.get_readrows_iterator')
+    def test_get_cells_iterator_key_not_found(self, mock_get_readrows_iterator):
+        mock_data = [
+            {
+                "event_params": [{
+                    "key": "some_other_key",
+                    "value": {
+                        'int_value': 2
+                    }
+                }]
+            },
+        ]
+        mock_get_readrows_iterator.return_value = iter(mock_data)
+        mock_table_metadata = TableMetadata(project_id="test-project",
+                                            dataset_id="test-dataset",
+                                            table_name="test-table")
+        result = list(
+            get_cells_iterator(MagicMock(spec=BigQueryReadClient),
+                               mock_table_metadata,
+                               "event_params.key[non_existent_key]"))
+        self.assertEqual(result, [None])
+        mock_get_readrows_iterator.assert_called_once()
+
+    @patch('core.bigquery.get_readrows_iterator')
+    def test_get_cells_iterator_return_full_record(self,
+                                                   mock_get_readrows_iterator):
+        # Simulate data where the specified key is not present
+        mock_data = [
+            {
+                "event_params": [{
+                    "key": "some_other_key",
+                    "value": {
+                        'int_value': 2
+                    }
+                }]
+            },
+        ]
+        mock_get_readrows_iterator.return_value = iter(mock_data)
+        mock_table_metadata = TableMetadata(project_id="test-project",
+                                            dataset_id="test-dataset",
+                                            table_name="test-table")
+        result = list(
+            get_cells_iterator(MagicMock(spec=BigQueryReadClient),
+                               mock_table_metadata, "event_params"))
+        self.assertEqual(result, [[{
+            "key": "some_other_key",
+            "value": {
+                'int_value': 2
+            }
+        }]])
+        mock_get_readrows_iterator.assert_called_once()
+
+
+# TODO(psnel) add support for highly nested usecases alternating between
+# repeated and nullable structures.

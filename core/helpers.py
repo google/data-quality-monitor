@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import re
 from typing import Any, Callable, Generic, List, NoReturn, TypeVar, Union
 
 
@@ -28,6 +29,33 @@ def get_function_name(function: Any) -> str:
 
     """
     return str(function.__qualname__.split('.')[0])
+
+
+PATTERN = re.compile(r"(^.*?)\[([^\[\]]*?)\](.*?)$")
+
+
+def parse_column_path(column: str) -> list:
+    """Parse the column string to extract nested fields and array indices.
+
+  Args:
+      column (str): The column string with potential nested fields and array
+        indices.
+
+  Returns:
+      list: A list of tuples, where each tuple contains the column name and the
+      key/index.
+  """
+    nested_columns = []
+    for col in column.split("."):
+        parts = PATTERN.match(col)
+        if parts:
+            column_name, key = parts.groups()[0], parts.groups()[1]
+        else:
+            column_name, key = col, None
+        if not column_name:
+            raise ValueError(f"Invalid column path: {column}")
+        nested_columns.append((column_name, key))
+    return nested_columns
 
 
 T = TypeVar('T')
