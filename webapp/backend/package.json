@@ -32,9 +32,9 @@
   },
   "dependencies": {
     "@google-cloud/bigquery": "^6.2.1",
-    "@google-cloud/scheduler": "^3.3.1",
+    "@google-cloud/scheduler": "^4.2.0",
     "@google-cloud/storage": "^7.0.0",
-    "@google-cloud/workflows": "^2.3.2",
+    "@google-cloud/workflows": "^3.3.0",
     "@types/express": "^4.17.17",
     "@types/cors": "^2.8.14",
     "@types/jest": "^29.5.3",
